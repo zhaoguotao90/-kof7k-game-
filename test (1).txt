@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KOF7K 通关信号测试</title>
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff3333;
+            text-align: center;
+        }
+        .game-container {
+            width: 800px;
+            height: 600px;
+            margin: 20px auto;
+            border: 3px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .status {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4a6bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #3555e5;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        .choice-btn {
+            padding: 15px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .video-btn {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
+        }
+        .continue-btn {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🥊 拳皇KOF7K 通关测试</h1>
+        
+        <div class="game-container" id="gameContainer"></div>
+        
+        <div class="status">
+            <h3>状态监控</h3>
+            <div class="log" id="log">等待游戏加载...</div>
+        </div>
+        
+        <div class="buttons">
+            <button onclick="loadGame()">加载游戏</button>
+            <button onclick="testSignal()">模拟通关信号</button>
+            <button onclick="clearLog()">清空日志</button>
+        </div>
+    </div>
+    
+    <!-- 通关选择弹窗 -->
+    <div id="victoryModal" class="modal">
+        <div class="modal-content">
+            <h2 style="color: #ffcc00; font-size: 2em;">🎉 恭喜通关！</h2>
+            <p style="color: white; font-size: 1.2em;">您已成功击败所有对手！</p >
+            
+            <div id="gameStats" style="margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                <p>🎮 游戏统计：</p >
+                <p>获胜方: <span id="winnerDisplay">玩家</span></p >
+                <p>胜利回合: <span id="winsDisplay">2</span></p >
+            </div>
+            
+            <div>
+                <button class="choice-btn video-btn" onclick="showVideo()">🎬 观看彩蛋视频</button>
+                <button class="choice-btn continue-btn" onclick="continueGame()">🎮 继续游戏</button>
+            </div>
+            
+            <p style="color: #aaa; margin-top: 20px; font-size: 0.9em;">10秒后自动继续游戏...</p >
+        </div>
+    </div>
+    
+    <!-- 视频播放器 -->
+    <div id="videoModal" class="modal">
+        <div style="position: relative; width: 90%; max-width: 800px;">
+            <button onclick="closeVideo()" style="position: absolute; top: 10px; right: 10px; background: red; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5em;">×</button>
+            <video id="hiddenVideo" controls style="width: 100%; border-radius: 10px;">
+                <!-- 请将视频文件放在同一目录下，或修改src为您的视频路径 -->
+                <source src="reward_video.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+    
+    <script>
+        // 全局变量
+        let rufflePlayer = null;
+        let countdown = 10;
+        let countdownTimer = null;
+        
+        // 日志函数
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff5555' : 
+                         type === 'success' ? '#55ff55' : 
+                         type === 'warning' ? '#ffff55' : '#aaaaaa';
+            
+            log.innerHTML += `<div style="color:${color}">[${time}] ${message}</div>`;
+            log.scrollTop = log.scrollHeight;
+            console.log(`[${type}] ${message}`);
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '日志已清空';
+        }
+        
+        // 加载游戏
+        async function loadGame() {
+            addLog('正在初始化Ruffle播放器...', 'info');
+            
+            // 移除旧的播放器
+            if (rufflePlayer) {
+                document.getElementById('gameContainer').innerHTML = '';
+            }
+            
+            // 配置Ruffle
+            window.RufflePlayer = window.RufflePlayer || {};
+            window.RufflePlayer.config = {
+                "autoplay": "on",
+                "unmuteOverlay": "hidden",
+                "backgroundColor": "#000000"
+            };
+            
+            try {
+                const ruffle = window.RufflePlayer.newest();
+                rufflePlayer = ruffle.createPlayer();
+                document.getElementById('gameContainer').appendChild(rufflePlayer);
+                
+                await rufflePlayer.load({
+                    url: 'kof7k_modified.swf',  // 确保文件名与您保存的一致
+                    width: 800,
+                    height: 600
+                });
+                
+                addLog('游戏加载成功！请开始游戏。', 'success');
+                
+            } catch (error) {
+                addLog(`游戏加载失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 监听来自Flash的消息
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type) {
+                console.log('收到消息:', event.data);
+                addLog(`收到信号: ${event.data.type}`, 'info');
+                
+                if (event.data.type === 'KOF_GAME_VICTORY' || 
+                    event.data.type === 'KOF_WIN' ||
+                    event.data.type.includes('VICTORY')) {
+                    
+                    addLog('🎉 检测到通关信号！', 'success');
+                    
+                    // 更新显示信息
+                    if (event.data.winner) {
+                        document.getElementById('winnerDisplay').textContent = 
+                            event.data.winner === 'PLAYER_VICTORY' ? '玩家' : '电脑';
+                    }
+                    if (event.data.playerWins) {
+                        document.getElementById('winsDisplay').textContent = event.data.playerWins;
+                    }
+                    
+                    // 显示通关弹窗
+                    showVictoryModal();
+                }
+            }
+        });
+        
+        // 为ExternalInterface准备的函数
+        window.onKofVictory = function(winner) {
+            addLog(`通过ExternalInterface收到胜利信号: ${winner}`, 'success');
+            document.getElementById('winnerDisplay').textContent = 
+                winner === 'PLAYER_VICTORY' ? '玩家' : '电脑';
+            showVictoryModal();
+        };
+        
+        // 弹窗控制
+        function showVictoryModal() {
+            const modal = document.getElementById('victoryModal');
+            modal.style.display = 'flex';
+            
+            // 开始倒计时
+            startCountdown();
+            
+            addLog('通关选择弹窗已显示', 'info');
+        }
+        
+        function hideVictoryModal() {
+            document.getElementById('victoryModal').style.display = 'none';
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+        }
+        
+        function startCountdown() {
+            countdown = 10;
+            const countdownElement = document.querySelector('#victoryModal p:last-child');
+            
+            countdownTimer = setInterval(() => {
+                countdown--;
+                if (countdownElement) {
+                    countdownElement.textContent = `${countdown}秒后自动继续游戏...`;
+                }
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownTimer);
+                    continueGame();
+                }
+            }, 1000);
+        }
+        
+        // 用户选择
+        function showVideo() {
+            addLog('用户选择观看视频', 'info');
+            hideVictoryModal();
+            
+            const videoModal = document.getElementById('videoModal');
+            const video = document.getElementById('hiddenVideo');
+            
+            videoModal.style.display = 'flex';
+            
+            // 尝试播放视频
+            video.play().catch(error => {
+                addLog(`视频播放失败: ${error.message}`, 'warning');
+            });
+            
+            // 视频结束时自动关闭
+            video.onended = function() {
+                setTimeout(() => {
+                    closeVideo();
+                    addLog('视频播放完成', 'info');
+                }, 1000);
+            };
+        }
+        
+        function closeVideo() {
+            const videoModal = document.getElementById('videoModal');
+            const video = document.getElementById('hiddenVideo');
+            
+            video.pause();
+            video.currentTime = 0;
+            videoModal.style.display = 'none';
+        }
+        
+        function continueGame() {
+            addLog('用户选择继续游戏', 'info');
+            hideVictoryModal();
+            
+            // 重新加载游戏
+            if (rufflePlayer) {
+                rufflePlayer.load({
+                    url: 'kof7k_modified.swf',
+                    width: 800,
+                    height: 600
+                });
+                addLog('游戏已重新加载', 'info');
+            }
+        }
+        
+        // 测试函数
+        function testSignal() {
+            addLog('发送测试通关信号...', 'warning');
+            
+            // 模拟发送通关信号
+            window.postMessage({
+                type: 'KOF_GAME_VICTORY',
+                winner: 'PLAYER_VICTORY',
+                playerWins: 2,
+                roundMax: 3
+            }, '*');
+            
+            addLog('测试信号已发送', 'success');
+        }
+        
+        // 检查URL参数
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('kof_victory')) {
+                const winner = params.get('kof_victory');
+                addLog(`从URL参数检测到通关: ${winner}`, 'warning');
+                
+                window.postMessage({
+                    type: 'URL_VICTORY',
+                    winner: winner === 'player' ? 'PLAYER_VICTORY' : 'CPU_VICTORY'
+                }, '*');
+            }
+        }
+        
+        // 页面加载完成
+        window.addEventListener('DOMContentLoaded', () => {
+            addLog('页面加载完成', 'info');
+            checkUrlParams();  // 检查URL参数
+        });
+    </script>
+</body>
+</html>
