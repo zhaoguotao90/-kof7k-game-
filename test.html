@@ -1056,40 +1056,40 @@
             document.getElementById('gameTime').textContent = '00:00';
             
             if (gameTimer) {
-                文件(游戏定时器);
-                游戏定时器 = 空;
+                clearInterval(gameTimer);
+                gameTimer = null;
             }
             
-            如果 (吹皱播放器) {
-                常数 游戏屏幕 = 文件.getElementById('gameScreen');
-比赛屏幕 . innerhtml = < 差异风格 = " color:# ccccff；文本对齐：居中;"> < div style = " font-size:3em；下边距:15px " >🔄</div >游戏已重置< br >点击"加载游戏"重新开始</div > '；游戏屏幕.innerHTML = < div style = " color:# ccccff；文本对齐:居中；"> < div style = " font-size:3em；下边距:15px">🔄</div >游戏已重置< br >点击"加载游戏"重新开始</div > ';
-                吹皱播放器 = 空;
+            if (rufflePlayer) {
+                const gameScreen = document.getElementById('gameScreen');
+                gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center;"><div style="font-size: 3em; margin-bottom: 15px;">🔄</div>游戏已重置<br>点击"加载游戏"重新开始</div>';
+                rufflePlayer = null;
             }
             
-            添加日志('游戏状态已重置', 信息);
-            添加调试('游戏状态已重置');
+            addLog('游戏状态已重置', 'info');
+            addDebug('游戏状态已重置');
         }
         
         // ==================== 初始化 ====================
-        窗户.addEventListener(' DOMContentLoaded ', () => {
-            添加日志('闪翼拳皇 1.91 格斗传承测试系统已启动', 'success');
-            添加调试('页面加载完成，初始化完成');
-            添加日志('请点击"加载游戏"按钮开始游戏', 'info');
+        window.addEventListener('DOMContentLoaded', () => {
+            addLog('闪翼拳皇 1.91 格斗传承测试系统已启动', 'success');
+            addDebug('页面加载完成，初始化完成');
+            addLog('请点击"加载游戏"按钮开始游戏', 'info');
             
             // 检查URL参数
-            常数 urlParams = 新的 URLSearchParams(window.location.search);
-            如果 (urlParams.有(kof_胜利')) {
-                常数 赢家 = urlParams.得到('kof_victory');
-                添加日志(`从统一资源定位器参数检测到通关：${winner}`, 'warning');
-                添加调试(`网址参数检测到通关：${winner}`);
-                测试信号();
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('kof_victory')) {
+                const winner = urlParams.get('kof_victory');
+                addLog(`从URL参数检测到通关: ${winner}`, 'warning');
+                addDebug(`URL参数检测到通关: ${winner}`);
+                testSignal();
             }
             
             // 初始化统计
             updateVictoryCount();
-            更新PlayerWins(0);
-            更新游戏状态('未开始');
+            updatePlayerWins(0);
+            updateGameStatus('未开始');
         });
-    </脚本>
-</身体>
-</超文本标记语言>
+    </script>
+</body>
+</html>
