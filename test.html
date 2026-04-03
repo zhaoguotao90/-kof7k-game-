@@ -14,21 +14,6 @@
         }
         
         body {
-            font-family: 'Microsoft YaHei',<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>闪翼拳皇 1.91 - 格斗传承</title>
-    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
             font-family: 'Microsoft YaHei', 'Arial', sans-serif;
             background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3a 100%);
             color: white;
@@ -47,16 +32,18 @@
             text-align: center;
             margin-bottom: 30px;
             position: relative;
+            padding: 20px 0;
+            border-bottom: 3px solid #ffcc00;
         }
         
         .main-title {
-            font-size: 3.5em;
-            background: linear-gradient(45deg, #ff0000, #ff9900, #ffff00);
+            font-size: 3.2em;
+            background: linear-gradient(45deg, #ffcc00, #ff9900, #ff6600);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
-            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+            margin-bottom: 5px;
             font-weight: bold;
             letter-spacing: 2px;
         }
@@ -82,9 +69,62 @@
             margin-bottom: 40px;
         }
         
-        /* 游戏区域 */
+        /* 左侧信息区域 */
+        .info-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .game-intro {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #ff6600;
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
+        }
+        
+        .section-title {
+            color: #ffcc00;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #ff6600;
+            padding-bottom: 10px;
+        }
+        
+        .features {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .features li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ccccff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1em;
+        }
+        
+        .features li:before {
+            content: "★";
+            color: #ffcc00;
+            font-size: 1.2em;
+        }
+        
+        .update-info {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #33cc66;
+            box-shadow: 0 0 20px rgba(51, 204, 102, 0.3);
+        }
+        
+        /* 右侧游戏区域 */
         .game-section {
-            flex: 2;
+            flex: 1.5;
             min-width: 300px;
         }
         
@@ -99,7 +139,7 @@
         
         .game-screen {
             width: 100%;
-            height: 500px;
+            height: 450px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -109,38 +149,49 @@
         /* 控制面板 */
         .control-panel {
             background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 15px;
+            padding: 25px;
             border: 2px solid #3366ff;
+            box-shadow: 0 0 20px rgba(51, 102, 255, 0.3);
         }
         
-        .panel-title {
+        .control-title {
             color: #4cdfff;
-            font-size: 1.4em;
-            margin-bottom: 15px;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
         }
         
         .control-buttons {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
             margin-bottom: 20px;
         }
         
         .btn {
-            padding: 12px 20px;
+            padding: 15px 20px;
             background: linear-gradient(135deg, #3366ff, #2244cc);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             text-align: center;
+        }
+        
+        .btn i {
+            font-size: 1.2em;
         }
         
         .btn:hover {
@@ -165,61 +216,25 @@
             background: linear-gradient(135deg, #44dd77, #33bb55);
         }
         
-        /* 信息面板 */
-        .info-section {
-            flex: 1;
-            min-width: 300px;
+        .px.secondary {
+            background: linear-gradient(135deg, #9933ff, #7722cc);
         }
         
-        .update-info {
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 2px solid #ffcc00;
+        .btn.secondary:hover {
+            background: linear-gradient(135deg, #aa44ff, #8833dd);
         }
         
-        .info-title {
-            color: #ffcc00;
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .update-list {
-            list-style: none;
-        }
-        
-        .update-list li {
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: #ccccff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .update-list li:before {
-            content: "★";
-            color: #ffcc00;
-        }
-        
-        .stats-panel {
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            padding: 20px;
-            border: 2px solid #33cc66;
-        }
-        
+        /* 状态统计 */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            margin-top: 20px;
         }
         
         .stat-item {
             text-align: center;
-            padding: 10px;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
         }
@@ -232,17 +247,18 @@
         
         .stat-value {
             color: #4cdfff;
-            font-size: 1.3em;
+            font-size: 1.4em;
             font-weight: bold;
         }
         
         /* 日志区域 */
         .log-section {
             background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 20px;
             margin-top: 20px;
             border: 2px solid #9933ff;
+            box-shadow: 0 0 20px rgba(153, 51, 255, 0.3);
         }
         
         .log-title {
@@ -255,10 +271,10 @@
         }
         
         .log-content {
-            height: 200px;
+            height: 180px;
             overflow-y: auto;
             background: rgba(0, 0, 0, 0.5);
-            border-radius: 5px;
+            border-radius: 8px;
             padding: 10px;
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
@@ -401,6 +417,12 @@
             font-size: 0.9em;
         }
         
+        .creator {
+            color: #ffcc00;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+        
         /* 响应式调整 */
         @media (max-width: 768px) {
             .main-content {
@@ -408,7 +430,7 @@
             }
             
             .control-buttons {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
             }
             
             .stats-grid {
@@ -422,6 +444,10 @@
             .subtitle {
                 font-size: 1.4em;
             }
+            
+            .game-screen {
+                height: 400px;
+            }
         }
     </style>
 </head>
@@ -429,44 +455,22 @@
     <div class="container">
         <!-- 标题区域 -->
         <div class="header">
-            <h1 class="main-title">拳皇KOF7K 通关测试</h1>
-            <h2 class="subtitle">闪翼拳皇 1.91 - 格斗传承</h2>
+            <h1 class="main-title">闪翼拳皇 1.91</h1>
+            <h2 class="subtitle">格斗传承</h2>
             <div class="version">光效华丽升级 | 新角色-卢卡尔 | 部分人物Bug修正</div>
         </div>
         
         <!-- 主内容区域 -->
         <div class="main-content">
-            <!-- 游戏区域 -->
-            <div class="game-section">
-                <div class="game-container">
-                    <div id="gameScreen" class="game-screen">
-                        <!-- Ruffle播放器将在这里加载游戏 -->
-                        <div id="loadingText" style="color: #ccccff; font-size: 1.2em;">
-                            游戏容器准备就绪，点击"加载游戏"开始
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 控制面板 -->
-                <div class="control-panel">
-                    <h3 class="panel-title">🎮 控制面板</h3>
-                    <div class="control-buttons">
-                        <button class="btn" onclick="loadGame()">加载游戏</button>
-                        <button class="btn warning" onclick="testSignal()">模拟通关信号</button>
-                        <button class="btn" onclick="clearLog()">清空日志</button>
-                        <button class="btn" onclick="showDebugInfo()">调试信息</button>
-                        <button class="btn success" onclick="forceShowModal()">测试弹窗</button>
-                        <button class="btn" onclick="resetGame()">重置游戏</button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 信息面板 -->
+            <!-- 左侧信息区域 -->
             <div class="info-section">
-                <!-- 更新信息 -->
-                <div class="update-info">
-                    <h3 class="info-title">📢 版本更新</h3>
-                    <ul class="update-list">
+                <!-- 游戏介绍 -->
+                <div class="game-intro">
+                    <h3 class="section-title">🎮 游戏特色</h3>
+                    <p style="color: #ccccff; line-height: 1.6; margin-bottom: 20px;">
+                        闪翼拳皇 1.91 格斗传承版本，带来前所未有的格斗体验！炫酷光效全面升级，新角色卢卡尔强势加入，战斗更加刺激！
+                    </p>
+                    <ul class="features">
                         <li>光效华丽升级，视觉效果全面提升</li>
                         <li>新角色-卢卡尔加入战斗</li>
                         <li>部分人物Bug已经修正</li>
@@ -475,9 +479,65 @@
                     </ul>
                 </div>
                 
-                <!-- 统计面板 -->
-                <div class="stats-panel">
-                    <h3 class="panel-title">📊 游戏统计</h3>
+                <!-- 更新信息 -->
+                <div class="update-info">
+                    <h3 class="section-title">📢 更新说明</h3>
+                    <p style="color: #ccccff; line-height: 1.6; margin-bottom: 15px;">
+                        香港16岁少年精心打造，致力于为玩家带来最纯粹、最刺激的格斗体验。
+                    </p>
+                    <p style="color: #ffcc00; font-weight: bold; margin-top: 15px;">
+                        🔥 温馨提示：通关后可解锁隐藏彩蛋视频！
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 右侧游戏区域 -->
+            <div class="game-section">
+                <!-- 游戏容器 -->
+                <div class="game-container">
+                    <div id="gameScreen" class="game-screen">
+                        <!-- Ruffle播放器将在这里加载游戏 -->
+                        <div id="loadingText" style="color: #ccccff; font-size: 1.2em; text-align: center;">
+                            <i class="fas fa-gamepad" style="font-size: 2em; margin-bottom: 10px; display: block;"></i>
+                            游戏容器准备就绪<br>点击"加载游戏"开始
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 控制面板 -->
+                <div class="control-panel">
+                    <h3 class="control-title">
+                        <i class="fas fa-sliders-h"></i>
+                        控制面板
+                    </h3>
+                    <div class="control-buttons">
+                        <button class="btn" onclick="loadGame()">
+                            <i class="fas fa-gamepad"></i>
+                            加载游戏
+                        </button>
+                        <button class="btn warning" onclick="testSignal()">
+                            <i class="fas fa-broadcast-tower"></i>
+                            模拟通关信号
+                        </button>
+                        <button class="btn" onclick="clearLog()">
+                            <i class="fas fa-trash-alt"></i>
+                            清空日志
+                        </button>
+                        <button class="btn secondary" onclick="showDebugInfo()">
+                            <i class="fas fa-bug"></i>
+                            调试信息
+                        </button>
+                        <button class="btn success" onclick="forceShowModal()">
+                            <i class="fas fa-window-restore"></i>
+                            测试弹窗
+                        </button>
+                        <button class="btn secondary" onclick="resetGame()">
+                            <i class="fas fa-redo"></i>
+                            重置游戏
+                        </button>
+                    </div>
+                    
+                    <!-- 状态统计 -->
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-label">通关次数</div>
@@ -502,7 +562,10 @@
         
         <!-- 日志区域 -->
         <div class="log-section">
-            <h3 class="log-title">📡 信号监控日志</h3>
+            <h3 class="log-title">
+                <i class="fas fa-satellite-dish"></i>
+                信号监控日志
+            </h3>
             <div id="logContent" class="log-content">
                 <div class="log-entry info">[系统] 页面加载完成，等待操作...</div>
             </div>
@@ -510,8 +573,12 @@
         
         <!-- 页脚 -->
         <div class="footer">
-            <p>闪翼拳皇 1.91 - 格斗传承 | 测试系统 v2.0 | 使用Ruffle播放器加载Flash游戏</p>
-            <p style="margin-top: 10px; color: #9999ff;">提示：游戏通关后会自动触发彩蛋视频，您可以选择观看或继续游戏</p>
+            <p>闪翼拳皇 1.91 - 格斗传承   测试系统 v2.0   使用Ruffle播放器加载Flash游戏</p>
+            <p class="creator">此版本由拳皇wing资深玩家打造，香港16岁少年倾情奉献</p>
+            <p style="margin-top: 10px; color: #9999ff;">
+                <i class="fas fa-exclamation-circle"></i>
+                提示：游戏通关后会自动触发彩蛋视频，您可以选择观看或继续游戏
+            </p>
         </div>
     </div>
     
@@ -544,11 +611,11 @@
             
             <div class="choice-buttons">
                 <button class="choice-btn video" onclick="showVideo()">
-                    <span>🎬</span>
+                    <i class="fas fa-film"></i>
                     <span>观看彩蛋视频</span>
                 </button>
                 <button class="choice-btn continue" onclick="continueGame()">
-                    <span>🎮</span>
+                    <i class="fas fa-gamepad"></i>
                     <span>继续挑战 (更高难度)</span>
                 </button>
             </div>
@@ -561,7 +628,10 @@
     <div id="videoModal" class="modal">
         <div class="video-player">
             <div class="video-header">
-                <div class="video-title">🎁 通关奖励 - 隐藏彩蛋视频</div>
+                <div class="video-title">
+                    <i class="fas fa-gift"></i>
+                    通关奖励 - 隐藏彩蛋视频
+                </div>
                 <button class="close-video" onclick="closeVideo()">×</button>
             </div>
             <video id="hiddenVideo" controls style="width:100%;">
@@ -579,6 +649,7 @@
         let countdownTimer = null;
         let countdownValue = 10;
         let gameStatus = '未开始';
+        let gameTimer = null;
         
         // ==================== 日志系统 ====================
         function addLog(message, type = 'info') {
@@ -600,13 +671,14 @@
         // ==================== 游戏控制 ====================
         async function loadGame() {
             addLog('正在初始化Ruffle播放器...', 'info');
+            updateGameStatus('加载中');
             
             // 移除旧的播放器
             const gameScreen = document.getElementById('gameScreen');
             if (rufflePlayer) {
-                gameScreen.innerHTML = '<div style="color:#ccccff;">游戏重新加载中...</div>';
+                gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center;"><i class="fas fa-sync-alt fa-spin" style="font-size: 2em; margin-bottom: 10px; display: block;"></i>游戏重新加载中...</div>';
             } else {
-                gameScreen.innerHTML = '<div style="color:#ccccff;">游戏加载中，请稍候...</div>';
+                gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center;"><i class="fas fa-spinner fa-spin" style="font-size: 2em; margin-bottom: 10px; display: block;"></i>游戏加载中，请稍候...</div>';
             }
             
             // 配置Ruffle
@@ -624,10 +696,11 @@
                 gameScreen.innerHTML = '';
                 gameScreen.appendChild(rufflePlayer);
                 
+                // 使用直链加载游戏
                 await rufflePlayer.load({
-                    url: 'kof7k_modified.swf',
+                    url: 'https://file.wd02.com/dl/5b320d25d4c1f9faab3ec77f3603ddf2.swf',
                     width: 800,
-                    height: 500
+                    height: 450
                 });
                 
                 addLog('✅ 游戏加载成功！请开始游戏。', 'success');
@@ -637,7 +710,8 @@
                 
             } catch (error) {
                 addLog(`❌ 游戏加载失败: ${error.message}`, 'error');
-                gameScreen.innerHTML = '<div style="color:#ff6666; text-align:center; padding:50px;">游戏加载失败<br>' + error.message + '</div>';
+                gameScreen.innerHTML = '<div style="color:#ff6666; text-align:center; padding:50px;"><i class="fas fa-exclamation-triangle" style="font-size: 3em; margin-bottom: 20px; display: block;"></i>游戏加载失败<br>' + error.message + '</div>';
+                updateGameStatus('加载失败');
             }
         }
         
@@ -761,9 +835,9 @@
             // 重新加载游戏
             if (rufflePlayer) {
                 rufflePlayer.load({
-                    url: 'kof7k_modified.swf',
+                    url: 'https://file.wd02.com/dl/5b320d25d4c1f9faab3ec77f3603ddf2.swf',
                     width: 800,
-                    height: 500
+                    height: 450
                 });
                 addLog('游戏已重新加载，开始新的一轮', 'info');
             }
@@ -771,7 +845,7 @@
             // 显示提示
             setTimeout(() => {
                 const msg = document.createElement('div');
-                msg.innerHTML = '🎮 难度已提升！准备迎接挑战！';
+                msg.innerHTML = '<i class="fas fa-fire"></i> 难度已提升！准备迎接挑战！';
                 msg.style.cssText = `
                     position: fixed;
                     top: 20px;
@@ -783,6 +857,10 @@
                     border-radius: 10px;
                     z-index: 9999;
                     box-shadow: 0 5px 20px rgba(255,0,0,0.3);
+                    font-size: 1.2em;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
                 `;
                 document.body.appendChild(msg);
                 
@@ -799,91 +877,100 @@
         
         // ==================== 工具函数 ====================
         function startGameTimer() {
-            setInterval(() => {
-                if (gameStartTime) {
-                    const now = new Date();
-                    const diff = Math.floor((now - gameStartTime) / 1000);
-                    const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
-                    const seconds = (diff % 60).toString().padStart(2, '0');
-                    document.getElementById('gameTime').textContent = `${minutes}:${seconds}`;
+            if (gameTimer) {
+                clearInterval(gameTimer);
+            }
+            
+            setIntervalgameTimer设定间隔(() => {
+                gameStartTime (if) {
+                    Date现在const新的 日期();
+                    gameStartTimeconst = 数学.地面((现在 - 游戏开始时间) / 1000);
+                    diff分钟const数学.地面(差速器 / 60).toString().padStart(2, '0');
+                    diff秒const(差速器 % 60).toString().padStart(2, '0');
+                    secondsdocumentgetElementById(“游戏时间”).文本内容 = `${分钟}:${秒}`;
                 }
             }, 1000);
         }
         
-        function updateVictoryCount() {
-            document.getElementById('victoryCount').textContent = victoryCount;
+        statusupdateVictoryCount() {
+            文件.getElementById('胜利计数').文本内容 = 维多利亚伯爵;
         }
         
-        function updateGameStatus(status) {
-            gameStatus = status;
-            document.getElementById('gameStatus').textContent = status;
+        功能 更新游戏状态(状态) {
+            游戏状态 = 状态;
+            文件.getElementById(游戏状态).文本内容 = 状态;
         }
         
-        function updatePlayerWins(wins) {
-            document.getElementById('playerWins').textContent = wins || 0;
+函数更新PlayerWins(；testSignal)wins{功能 更新PlayerWins(视窗网际网路名称服务) {
+文件 . getelementbyid(“玩家获胜”)。文本内容 = 视窗网际网路名称服务0；文件.getElementById(playerWins的).文本内容 = 视窗网际网路名称服务 || 0;
         }
         
         // ==================== 测试函数 ====================
-        function testSignal() {
-            addLog('手动触发模拟通关信号...', 'warning');
+函数测试信号() {功能 测试信号() {
+添加日志('手动触发模拟通关信号...'，‘警告’)；添加日志('手动触发模拟通关信号...', '警告');
             
-            window.postMessage({
-                type: 'KOF_GAME_VICTORY',
-                winner: 'PLAYER_VICTORY',
-                playerWins: 2,
-                roundMax: 3
+窗户.邮件({窗户.邮件({
+键入:KOF ,KOF:“KOF_游戏_胜利",
+赢家:'玩家_胜利'，获胜者: 玩家_胜利',
+玩家视窗网际网路名称服务: 2，playerWins: 2,
+圆形最大值: 3圆形最大值: 3
             }, '*');
             
-            addLog('测试信号已发送', 'success');
+添加日志('测试信号已发送,'成功');添加日志('测试信号已发送', '成功');
         }
         
-        function showDebugInfo() {
-            addLog('=== 调试信息 ===', 'info');
-            addLog(`游戏状态: ${gameStatus}`, 'info');
-            addLog(`通关次数: ${victoryCount}`, 'info');
-            addLog(`Ruffle播放器: ${rufflePlayer ? '已加载' : '未加载'}`, 'info');
+函数showDebugInfo() 更新关于PlayerWins功能 关于showDebugInfo() {
+添加日志('===调试信息=== '，信息)；添加日志('=== 调试信息 ===', 信息);
+添加日志(” 0Game Status:$ { gameStatus }, 信息)；添加日志(`游戏状态: ${游戏状态}`, 信息);
+添加日志(` 0通关次数:$ {胜利计数} ` 1, 信息)；添加日志(`通关次数: ${维多利亚伯爵}`, 信息);
+添加日志(“皱褶”播放器:$ {荷叶边播放器？'已加载' : '未加载} `, 信息)；添加日志(“皱褶播放器：${吹皱播放器 ? '已加载' : '未加载'}`, 信息);
         }
         
-        function forceShowModal() {
-            addLog('强制显示通关弹窗', 'warning');
-            testSignal();
+函数关于forceShowModal() {功能 关于forceShowModal() {
+添加日志('强制显示通关弹窗,'警告');添加日志('强制显示通关弹窗', '警告');
+试验信号()；测试信号();
         }
         
-        function resetGame() {
-            victoryCount = 0;
-            updateVictoryCount();
-            updatePlayerWins(0);
-            updateGameStatus('未开始');
-            gameStartTime = null;
-            document.getElementById('gameTime').textContent = '00:00';
+函数ResetGame() {功能 重置游戏() {
+            维多利亚伯爵 = 0;
+            更新维多利亚伯爵();
+            Aktualisierungen zu About关于PlayerWins(0);更新至关于PlayerWinsAktualisieren Aktualisierungen );
+            更新游戏状态('未开始');
+            游戏开始时间 = 空;
+            文件.getElementById(“游戏时间”).文本内容 = '00:00';
             
-            if (rufflePlayer) {
-                const gameScreen = document.getElementById('gameScreen');
-                gameScreen.innerHTML = '<div style="color:#ccccff;">游戏已重置，点击"加载游戏"重新开始</div>';
-                rufflePlayer = null;
+            如果 (游戏定时器) {
+                间隙(游戏定时器);
+                游戏定时器 = 空;
             }
             
-            addLog('游戏状态已重置', 'info');
+            如果 (吹皱播放器) {
+                常数 游戏屏幕 = 文件.getElementById('游戏屏幕');
+                游戏屏幕.innerHTML = < 差异风格 = 颜色:# cccccffTextaligned:居中;”> < 我班级 = 关于法斯格兰楼梯第四大量-比赛处理”风格 = 字体-大小:2全身长的;边界-楼下: 10像素显示：阻止;”> </i >游戏已重置< br >点击"加载游戏"重新开始</差异 > ';
+                吹皱播放器 = 空;
+            }
+            
+            添加日志('游戏状态已重置', 信息);
         }
         
         // ==================== 初始化 ====================
-        window.addEventListener('DOMContentLoaded', () => {
-            addLog('闪翼拳皇 1.91 测试系统已启动', 'success');
-            addLog('请点击"加载游戏"按钮开始游戏', 'info');
+        窗户.使用 使用 使用 使用 addEventListener(" DOMContentLoaded "“DOMContentLoaded”() => {
+            添加日志('闪翼拳皇 1.91 格斗传承测试系统已启动', “成功”);
+            添加日志('请点击"加载游戏"按钮开始游戏', 信息);
             
             // 检查URL参数
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('kof_victory')) {
-                const winner = urlParams.get('kof_victory');
-                addLog(`从URL参数检测到通关: ${winner}`, 'warning');
-                testSignal();
+            常数 urlparams = 新的 在 ... 里贝索格 aufüberURLSearchParams(窗户.位置.搜索);
+            如果 (urlparams.有(科夫_胜利')) {
+                常数 赢家 = urlparams.得到(科夫_胜利');
+                添加日志(`从统一资源定位器参数检测到通关：${赢家}`, '警告');
+                测试信号();
             }
             
             // 初始化统计
-            updateVictoryCount();
-            updatePlayerWins(0);
-            updateGameStatus('未开始');
+            更新维多利亚伯爵();
+            更新关于PlayerWins(0);
+            更新游戏状态('未开始');
         });
-    </script>
-</body>
+    </脚本>
+</身体>
 </html>
