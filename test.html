@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>闪翼拳皇 1.91 - 格斗传承</title>
-    <!-- 引入Ruffle播放器 -->
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <style>
         * {
@@ -37,7 +36,7 @@
         }
         
         .main-title {
-            font-size: 3.5em;
+            font-size: 3.2em;
             background: linear-gradient(45deg, #ffcc00, #ff9900, #ffff00);
             -webkit-background-clip: text;
             background-clip: text;
@@ -69,9 +68,62 @@
             margin-bottom: 40px;
         }
         
-        /* 游戏区域 */
+        /* 左侧信息区域 */
+        .info-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .game-intro {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #ff6600;
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
+        }
+        
+        .section-title {
+            color: #ffcc00;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #ff6600;
+            padding-bottom: 10px;
+        }
+        
+        .features {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .features li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ccccff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1em;
+        }
+        
+        .features li:before {
+            content: "★";
+            color: #ffcc00;
+            font-size: 1.2em;
+        }
+        
+        .update-info {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #33cc66;
+            box-shadow: 0 0 20px rgba(51, 204, 102, 0.3);
+        }
+        
+        /* 右侧游戏区域 */
         .game-section {
-            flex: 2;
+            flex: 1.5;
             min-width: 300px;
         }
         
@@ -97,42 +149,48 @@
         .control-panel {
             background: rgba(0, 0, 0, 0.7);
             border-radius: 10px;
-            padding: 20px;
+            padding: 25px;
             border: 2px solid #3366ff;
         }
         
-        .panel-title {
+        .control-title {
             color: #4cdfff;
-            font-size: 1.3em;
-            margin-bottom: 15px;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
         }
         
         .control-buttons {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
             margin-bottom: 20px;
         }
         
         .btn {
-            padding: 12px 20px;
+            padding: 15px 20px;
             background: linear-gradient(135deg, #3366ff, #2244cc);
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             text-align: center;
         }
         
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(51, 102, 255, 0.4);
             background: linear-gradient(135deg, #4477ff, #3355dd);
         }
         
@@ -160,63 +218,17 @@
             background: linear-gradient(135deg, #aa44ff, #8833dd);
         }
         
-        /* 信息面板 */
-        .info-section {
-            flex: 1;
-            min-width: 300px;
-        }
-        
-        .update-info {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(30, 30, 60, 0.7));
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 2px solid #ffcc00;
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
-        }
-        
-        .info-title {
-            color: #ffcc00;
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .update-list {
-            list-style: none;
-        }
-        
-        .update-list li {
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: #ccccff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .update-list li:before {
-            content: "★";
-            color: #ffcc00;
-        }
-        
-        .stats-panel {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(30, 60, 30, 0.7));
-            border-radius: 15px;
-            padding: 20px;
-            border: 2px solid #33cc66;
-            box-shadow: 0 0 20px rgba(51, 204, 102, 0.3);
-        }
-        
+        /* 状态统计 */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            margin-top: 20px;
         }
         
         .stat-item {
             text-align: center;
-            padding: 10px;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
         }
@@ -229,13 +241,13 @@
         
         .stat-value {
             color: #4cdfff;
-            font-size: 1.3em;
+            font-size: 1.4em;
             font-weight: bold;
         }
         
         /* 日志区域 */
         .log-section {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(60, 30, 60, 0.7));
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 15px;
             padding: 20px;
             margin-top: 20px;
@@ -271,55 +283,6 @@
         .log-entry.success { color: #33cc66; font-weight: bold; }
         .log-entry.warning { color: #ffcc00; }
         .log-entry.error { color: #ff6666; }
-        
-        /* 调试面板 */
-        .debug-panel {
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            border: 2px solid #ff9900;
-        }
-        
-        .debug-title {
-            color: #ff9900;
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .debug-content {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 5px;
-            padding: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85em;
-            height: 150px;
-            overflow-y: auto;
-            color: #cccccc;
-        }
-        
-        .debug-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .debug-btn {
-            padding: 8px 15px;
-            background: rgba(255, 153, 0, 0.3);
-            color: #ffcc99;
-            border: none;
-            border-radius: 5px;
-            font-size: 0.9em;
-            cursor: pointer;
-        }
-        
-        .debug-btn:hover {
-            background: rgba(255, 153, 0, 0.5);
-        }
         
         /* 模态窗口 */
         .modal {
@@ -400,7 +363,7 @@
         
         .countdown {
             margin-top: 20px;
-            color: #aaa;
+            color: #ccccff;
             font-size: 0.9em;
         }
         
@@ -480,8 +443,8 @@
     <div class="container">
         <!-- 标题区域 -->
         <div class="header">
-            <h1 class="main-title">闪翼拳皇 1.91</h1>
-            <h2 class="subtitle">格斗传承 - 调试版</h2>
+            <h1 class="main-title">拳皇KOF7K 通关测试</h1>
+            <h2 class="subtitle">闪翼拳皇 1.91 - 格斗传承</h2>
             <div class="version">光效华丽升级 | 新角色-卢卡尔 | 部分人物Bug修正</div>
         </div>
         
@@ -489,10 +452,10 @@
         <div class="main-content">
             <!-- 左侧信息区域 -->
             <div class="info-section">
-                <!-- 更新信息 -->
-                <div class="update-info">
-                    <h3 class="info-title">📢 更新说明</h3>
-                    <ul class="update-list">
+                <!-- 游戏介绍 -->
+                <div class="game-intro">
+                    <h3 class="section-title">🎮 游戏特色</h3>
+                    <ul class="features">
                         <li>光效华丽升级，视觉效果全面提升</li>
                         <li>新角色-卢卡尔加入战斗</li>
                         <li>部分人物Bug已经修正</li>
@@ -502,8 +465,8 @@
                 </div>
                 
                 <!-- 统计面板 -->
-                <div class="stats-panel">
-                    <h3 class="info-title">📊 游戏统计</h3>
+                <div class="update-info">
+                    <h3 class="section-title">📊 游戏统计</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-label">通关次数</div>
@@ -540,7 +503,7 @@
                 
                 <!-- 控制面板 -->
                 <div class="control-panel">
-                    <h3 class="panel-title">
+                    <h3 class="control-title">
                         <span>🎮</span>
                         控制面板
                     </h3>
@@ -571,22 +534,6 @@
                         </button>
                     </div>
                 </div>
-                
-                <!-- 调试面板 -->
-                <div class="debug-panel">
-                    <h3 class="debug-title">
-                        <span>🔍</span>
-                        调试控制台
-                    </h3>
-                    <div id="debugContent" class="debug-content">
-                        [系统] 调试控制台已启动...
-                    </div>
-                    <div class="debug-buttons">
-                        <button class="debug-btn" onclick="testRuffle()">测试Ruffle</button>
-                        <button class="debug-btn" onclick="testConnection()">测试连接</button>
-                        <button class="debug-btn" onclick="clearDebug()">清空调试</button>
-                    </div>
-                </div>
             </div>
         </div>
         
@@ -603,10 +550,10 @@
         
         <!-- 页脚 -->
         <div class="footer">
-            <p>闪翼拳皇 1.91 - 格斗传承 | 调试系统 v2.0 | 使用Ruffle播放器加载Flash游戏</p>
+            <p>闪翼拳皇 1.91 - 格斗传承 | 测试系统 v2.0 | 使用Ruffle播放器加载Flash游戏</p>
             <p style="margin-top: 10px; color: #9999ff;">
                 <span>⚠️</span>
-                提示：此版本包含调试功能，正式发布前请移除调试代码
+                提示：游戏通关后会自动触发彩蛋视频，您可以选择观看或继续游戏
             </p>
         </div>
     </div>
@@ -697,72 +644,9 @@
             log.innerHTML = '<div class="log-entry info">[系统] 日志已清空 ' + new Date().toLocaleTimeString() + '</div>';
         }
         
-        // ==================== 调试系统 ====================
-        function addDebug(message) {
-            const debug = document.getElementById('debugContent');
-            const time = new Date().toLocaleTimeString();
-            debug.innerHTML += `[${time}] ${message}<br>`;
-            debug.scrollTop = debug.scrollHeight;
-        }
-        
-        function clearDebug() {
-            document.getElementById('debugContent').innerHTML = '[系统] 调试控制台已清空 ' + new Date().toLocaleTimeString();
-        }
-        
-        function testRuffle() {
-            addDebug('测试Ruffle播放器状态...');
-            
-            if (window.RufflePlayer) {
-                addDebug('✅ RufflePlayer对象存在');
-                
-                if (window.RufflePlayer.newest) {
-                    addDebug('✅ RufflePlayer.newest函数存在');
-                    
-                    try {
-                        const ruffle = window.RufflePlayer.newest();
-                        addDebug('✅ RufflePlayer.newest()调用成功');
-                        
-                        if (ruffle.createPlayer) {
-                            addDebug('✅ ruffle.createPlayer函数存在');
-                        } else {
-                            addDebug('❌ ruffle.createPlayer函数不存在');
-                        }
-                    } catch (error) {
-                        addDebug(`❌ RufflePlayer.newest()调用失败: ${error.message}`);
-                    }
-                } else {
-                    addDebug('❌ RufflePlayer.newest函数不存在');
-                }
-            } else {
-                addDebug('❌ RufflePlayer对象不存在');
-            }
-        }
-        
-        function testConnection() {
-            addDebug('测试游戏文件连接...');
-            
-            // 测试直链是否可访问
-            const testUrl = 'https://file.wd02.com/dl/5b320d25d4c1f9faab3ec77f3603ddf2.swf';
-            addDebug(`尝试访问: ${testUrl}`);
-            
-            fetch(testUrl, { method: 'HEAD' })
-                .then(response => {
-                    if (response.ok) {
-                        addDebug('✅ 文件连接成功');
-                        addDebug(`文件大小: ${(response.headers.get('content-length') / 1024 / 1024).toFixed(2)}MB`);
-                    } else {
-                        addDebug(`❌ 文件连接失败: 状态码 ${response.status}`);
-                    }
-                })
-                .catch(error => {
-                    addDebug(`❌ 文件连接失败: ${error.message}`);
-                });
-        }
-        
         // ==================== 游戏控制 ====================
         async function loadGame() {
             addLog('正在初始化Ruffle播放器...', 'info');
-            addDebug('开始加载游戏...');
             updateGameStatus('加载中');
             
             // 移除旧的播放器
@@ -783,31 +667,52 @@
             };
             
             try {
-                addDebug('尝试创建Ruffle播放器实例...');
+                addLog('尝试创建Ruffle播放器实例...', 'info');
                 const ruffle = window.RufflePlayer.newest();
                 rufflePlayer = ruffle.createPlayer();
                 gameScreen.innerHTML = '';
                 gameScreen.appendChild(rufflePlayer);
                 
-                addDebug('播放器创建成功，开始加载游戏文件...');
+                addLog('播放器创建成功，开始加载游戏文件...', 'info');
                 
-                // 使用直链加载游戏
+                // 原始直链
+                const originalUrl = 'https://file.wd02.com/dl/5b320d25d4c1f9faab3ec77f3603ddf2.swf';
+                
+                // 使用 CORS 代理
+                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(originalUrl);
+                
+                addLog(`通过CORS代理加载: ${proxyUrl}`, 'info');
+                
+                // 通过代理加载游戏
                 await rufflePlayer.load({
-                    url: 'https://file.wd02.com/dl/5b320d25d4c1f9faab3ec77f3603ddf2.swf',
+                    url: proxyUrl,
                     width: 800,
                     height: 500
                 });
                 
                 addLog('✅ 游戏加载成功！请开始游戏。', 'success');
-                addDebug('游戏加载成功，准备开始');
                 updateGameStatus('进行中');
                 gameStartTime = new Date();
                 startGameTimer();
                 
             } catch (error) {
                 addLog(`❌ 游戏加载失败: ${error.message}`, 'error');
-                addDebug(`游戏加载失败: ${error.message}`);
-                gameScreen.innerHTML = '<div style="color:#ff6666; text-align:center; padding:50px;"><div style="font-size: 3em; margin-bottom: 20px;">❌</div>游戏加载失败<br>' + error.message + '</div>';
+                gameScreen.innerHTML = `
+                    <div style="color:#ff6666; text-align:center; padding:50px;">
+                        <div style="font-size: 3em; margin-bottom: 20px;">❌</div>
+                        <div style="font-size: 1.2em; margin-bottom: 10px;">游戏加载失败</div>
+                        <div style="color:#ff9999; margin-bottom: 20px;">${error.message}</div>
+                        <div style="margin-bottom: 10px;">CORS策略阻止了文件加载</div>
+                        <button onclick="loadGame()" style="
+                            padding: 10px 20px;
+                            background: #3366ff;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            margin-top: 20px;
+                        ">重新加载</button>
+                    </div>
+                `;
                 updateGameStatus('加载失败');
             }
         }
@@ -817,7 +722,6 @@
             if (event.data && event.data.type) {
                 console.log('收到消息:', event.data);
                 addLog(`收到信号: ${event.data.type}`, 'info');
-                addDebug(`收到消息事件: ${JSON.stringify(event.data)}`);
                 
                 if (event.data.type.includes('VICTORY') || 
                     event.data.type.includes('WIN') ||
@@ -831,7 +735,6 @@
         // ExternalInterface回调函数
         window.onKofVictory = function(winner) {
             addLog(`通过ExternalInterface收到胜利信号: ${winner}`, 'success');
-            addDebug(`ExternalInterface胜利信号: ${winner}`);
             handleVictorySignal({ type: 'EXTERNAL_VICTORY', winner: winner });
         };
         
@@ -841,7 +744,6 @@
             updateVictoryCount();
             
             addLog(`🎉 第${victoryCount}次通关！类型: ${gameData.type}`, 'success');
-            addDebug(`处理通关信号: ${JSON.stringify(gameData)}`);
             
             // 更新模态窗口信息
             document.getElementById('modalWinner').textContent = 
@@ -859,7 +761,6 @@
             const modal = document.getElementById('victoryModal');
             modal.style.display = 'flex';
             addLog('通关选择弹窗已显示', 'info');
-            addDebug('显示通关弹窗');
             
             startCountdown();
         }
@@ -868,7 +769,6 @@
             const modal = document.getElementById('victoryModal');
             modal.style.display = 'none';
             clearCountdown();
-            addDebug('隐藏通关弹窗');
         }
         
         function startCountdown() {
@@ -896,14 +796,12 @@
         
         function autoContinueGame() {
             addLog('倒计时结束，自动选择继续游戏', 'warning');
-            addDebug('自动继续游戏');
             continueGame();
         }
         
         // ==================== 用户选择 ====================
         function showVideo() {
             addLog('用户选择观看彩蛋视频', 'info');
-            addDebug('用户选择观看彩蛋视频');
             hideVictoryModal();
             
             const videoModal = document.getElementById('videoModal');
@@ -913,14 +811,12 @@
             
             video.play().catch(error => {
                 addLog(`视频播放失败: ${error.message}`, 'warning');
-                addDebug(`视频播放失败: ${error.message}`);
             });
             
             video.onended = function() {
                 setTimeout(() => {
                     closeVideo();
                     addLog('彩蛋视频播放完成', 'info');
-                    addDebug('彩蛋视频播放完成');
                 }, 1000);
             };
         }
@@ -932,23 +828,21 @@
             video.pause();
             video.currentTime = 0;
             videoModal.style.display = 'none';
-            addDebug('关闭视频播放器');
         }
         
         function continueGame() {
             addLog('用户选择继续游戏', 'info');
-            addDebug('用户选择继续游戏');
             hideVictoryModal();
             
             // 重新加载游戏
             if (rufflePlayer) {
                 rufflePlayer.load({
-                    url: 'https://file.wd02.com/dl/5b320d25d4c1f9faab3ec77f3603ddf2.swf',
+                    url: 'https://api.allorigins.win/raw?url=' + 
+                         encodeURIComponent('https://file.wd02.com/dl/5b320d25d4c1f9faab3ec77f3603ddf2.swf'),
                     width: 800,
                     height: 500
                 });
                 addLog('游戏已重新加载，开始新的一轮', 'info');
-                addDebug('重新加载游戏');
             }
             
             // 显示提示
@@ -1015,7 +909,6 @@
         // ==================== 测试函数 ====================
         function testSignal() {
             addLog('手动触发模拟通关信号...', 'warning');
-            addDebug('触发模拟通关信号');
             
             window.postMessage({
                 type: 'KOF_GAME_VICTORY',
@@ -1025,25 +918,17 @@
             }, '*');
             
             addLog('测试信号已发送', 'success');
-            addDebug('测试信号发送成功');
         }
         
         function showDebugInfo() {
             addLog('=== 调试信息 ===', 'info');
-            addDebug('显示调试信息');
-            
             addLog(`游戏状态: ${gameStatus}`, 'info');
             addLog(`通关次数: ${victoryCount}`, 'info');
             addLog(`Ruffle播放器: ${rufflePlayer ? '已加载' : '未加载'}`, 'info');
-            
-            addDebug(`游戏状态: ${gameStatus}`);
-            addDebug(`通关次数: ${victoryCount}`);
-            addDebug(`Ruffle播放器: ${rufflePlayer ? '已加载' : '未加载'}`);
         }
         
         function forceShowModal() {
             addLog('强制显示通关弹窗', 'warning');
-            addDebug('强制显示通关弹窗');
             testSignal();
         }
         
@@ -1067,23 +952,12 @@
             }
             
             addLog('游戏状态已重置', 'info');
-            addDebug('游戏状态已重置');
         }
         
         // ==================== 初始化 ====================
         window.addEventListener('DOMContentLoaded', () => {
             addLog('闪翼拳皇 1.91 格斗传承测试系统已启动', 'success');
-            addDebug('页面加载完成，初始化完成');
             addLog('请点击"加载游戏"按钮开始游戏', 'info');
-            
-            // 检查URL参数
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('kof_victory')) {
-                const winner = urlParams.get('kof_victory');
-                addLog(`从URL参数检测到通关: ${winner}`, 'warning');
-                addDebug(`URL参数检测到通关: ${winner}`);
-                testSignal();
-            }
             
             // 初始化统计
             updateVictoryCount();
