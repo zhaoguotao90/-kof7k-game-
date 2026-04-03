@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>闪翼拳皇 1.91 - 格斗传承</title>
-    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <style>
         * {
             margin: 0;
@@ -36,7 +35,7 @@
         }
         
         .main-title {
-            font-size: 3.2em;
+            font-size: 3.5em;
             background: linear-gradient(45deg, #ffcc00, #ff9900, #ffff00);
             -webkit-background-clip: text;
             background-clip: text;
@@ -68,62 +67,9 @@
             margin-bottom: 40px;
         }
         
-        /* 左侧信息区域 */
-        .info-section {
-            flex: 1;
-            min-width: 300px;
-        }
-        
-        .game-intro {
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 2px solid #ff6600;
-            box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
-        }
-        
-        .section-title {
-            color: #ffcc00;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            text-align: center;
-            border-bottom: 2px solid #ff6600;
-            padding-bottom: 10px;
-        }
-        
-        .features {
-            list-style: none;
-            margin-top: 20px;
-        }
-        
-        .features li {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: #ccccff;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.1em;
-        }
-        
-        .features li:before {
-            content: "★";
-            color: #ffcc00;
-            font-size: 1.2em;
-        }
-        
-        .update-info {
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            padding: 25px;
-            border: 2px solid #33cc66;
-            box-shadow: 0 0 20px rgba(51, 204, 102, 0.3);
-        }
-        
-        /* 右侧游戏区域 */
+        /* 游戏区域 */
         .game-section {
-            flex: 1.5;
+            flex: 2;
             min-width: 300px;
         }
         
@@ -149,42 +95,36 @@
         .control-panel {
             background: rgba(0, 0, 0, 0.7);
             border-radius: 10px;
-            padding: 25px;
+            padding: 20px;
             border: 2px solid #3366ff;
         }
         
-        .control-title {
+        .panel-title {
             color: #4cdfff;
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            text-align: center;
+            font-size: 1.4em;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
         }
         
         .control-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
             margin-bottom: 20px;
         }
         
         .btn {
-            padding: 15px 20px;
+            padding: 12px 20px;
             background: linear-gradient(135deg, #3366ff, #2244cc);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
             text-align: center;
         }
         
@@ -218,17 +158,61 @@
             background: linear-gradient(135deg, #aa44ff, #8833dd);
         }
         
-        /* 状态统计 */
+        /* 信息面板 */
+        .info-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .update-info {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #ffcc00;
+        }
+        
+        .info-title {
+            color: #ffcc00;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .update-list {
+            list-style: none;
+        }
+        
+        .update-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ccccff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .update-list li:before {
+            content: "★";
+            color: #ffcc00;
+        }
+        
+        .stats-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #33cc66;
+        }
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin-top: 20px;
         }
         
         .stat-item {
             text-align: center;
-            padding: 12px;
+            padding: 10px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
         }
@@ -241,18 +225,17 @@
         
         .stat-value {
             color: #4cdfff;
-            font-size: 1.4em;
+            font-size: 1.3em;
             font-weight: bold;
         }
         
         /* 日志区域 */
         .log-section {
             background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
+            border-radius: 10px;
             padding: 20px;
             margin-top: 20px;
             border: 2px solid #9933ff;
-            box-shadow: 0 0 20px rgba(153, 51, 255, 0.3);
         }
         
         .log-title {
@@ -265,7 +248,7 @@
         }
         
         .log-content {
-            height: 180px;
+            height: 200px;
             overflow-y: auto;
             background: rgba(0, 0, 0, 0.5);
             border-radius: 5px;
@@ -438,6 +421,44 @@
             }
         }
     </style>
+    
+    <!-- Ruffle播放器加载方案 -->
+    <script>
+        // 主CDN，优先级1
+        (function loadRuffle() {
+            const ruffleCDNs = [
+                'https://ruffle.zone/ruffle/ruffle.js',
+                'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle',
+                'https://unpkg.com/@ruffle-rs/ruffle',
+                'https://files.rg-adguard.net/files/ruffle-nightly-web/ruffle.js'
+            ];
+            
+            let currentCDN = 0;
+            
+            function loadNextCDN() {
+                if (currentCDN >= ruffleCDNs.length) {
+                    console.error('所有Ruffle CDN加载失败');
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = ruffleCDNs[currentCDN];
+                script.onload = function() {
+                    console.log(`✅ Ruffle播放器加载成功: ${ruffleCDNs[currentCDN]}`);
+                    initGame();
+                };
+                script.onerror = function() {
+                    console.warn(`❌ Ruffle CDN加载失败: ${ruffleCDNs[currentCDN]}`);
+                    currentCDN++;
+                    loadNextCDN();
+                };
+                
+                document.head.appendChild(script);
+            }
+            
+            loadNextCDN();
+        })();
+    </script>
 </head>
 <body>
     <div class="container">
@@ -450,23 +471,31 @@
         
         <!-- 主内容区域 -->
         <div class="main-content">
-            <!-- 左侧信息区域 -->
-            <div class="info-section">
-                <!-- 游戏介绍 -->
-                <div class="game-intro">
-                    <h3 class="section-title">🎮 游戏特色</h3>
-                    <ul class="features">
-                        <li>光效华丽升级，视觉效果全面提升</li>
-                        <li>新角色-卢卡尔加入战斗</li>
-                        <li>部分人物Bug已经修正</li>
-                        <li>加入血量测试器(练习模式中)，重置功能</li>
-                        <li>此版本由拳皇wing资深玩家打造</li>
-                    </ul>
+            <!-- 游戏区域 -->
+            <div class="game-section">
+                <div class="game-container">
+                    <div id="gameScreen" class="game-screen">
+                        <!-- Ruffle播放器将在这里加载游戏 -->
+                        <div id="loadingText" style="color: #ccccff; font-size: 1.2em; text-align: center;">
+                            <div style="font-size: 3em; margin-bottom: 15px;">🎮</div>
+                            游戏容器准备就绪<br>点击"加载游戏"开始
+                        </div>
+                    </div>
                 </div>
                 
-                <!-- 统计面板 -->
-                <div class="update-info">
-                    <h3 class="section-title">📊 游戏统计</h3>
+                <!-- 控制面板 -->
+                <div class="control-panel">
+                    <h3 class="panel-title">🎮 控制面板</h3>
+                    <div class="control-buttons">
+                        <button class="btn" onclick="loadGame()">加载游戏</button>
+                        <button class="btn warning" onclick="testSignal()">模拟通关信号</button>
+                        <button class="btn" onclick="clearLog()">清空日志</button>
+                        <button class="btn secondary" onclick="showDebugInfo()">调试信息</button>
+                        <button class="btn success" onclick="forceShowModal()">测试弹窗</button>
+                        <button class="btn" onclick="resetGame()">重置游戏</button>
+                    </div>
+                    
+                    <!-- 状态统计 -->
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-label">通关次数</div>
@@ -488,50 +517,32 @@
                 </div>
             </div>
             
-            <!-- 右侧游戏区域 -->
-            <div class="game-section">
-                <!-- 游戏容器 -->
-                <div class="game-container">
-                    <div id="gameScreen" class="game-screen">
-                        <!-- Ruffle播放器将在这里加载游戏 -->
-                        <div id="loadingText" style="color: #ccccff; font-size: 1.2em; text-align: center;">
-                            <div style="font-size: 3em; margin-bottom: 15px;">🎮</div>
-                            游戏容器准备就绪<br>点击"加载游戏"开始
-                        </div>
-                    </div>
+            <!-- 信息面板 -->
+            <div class="info-section">
+                <!-- 更新信息 -->
+                <div class="update-info">
+                    <h3 class="info-title">📢 版本更新</h3>
+                    <ul class="update-list">
+                        <li>光效华丽升级，视觉效果全面提升</li>
+                        <li>新角色-卢卡尔加入战斗</li>
+                        <li>部分人物Bug已经修正</li>
+                        <li>加入血量测试器(练习模式中)，重置功能</li>
+                        <li>此版本由拳皇wing资深玩家打造</li>
+                    </ul>
                 </div>
                 
-                <!-- 控制面板 -->
-                <div class="control-panel">
-                    <h3 class="control-title">
-                        <span>🎮</span>
-                        控制面板
-                    </h3>
-                    <div class="control-buttons">
-                        <button class="btn" onclick="loadGame()">
-                            <span>🔄</span>
-                            加载游戏
-                        </button>
-                        <button class="btn warning" onclick="testSignal()">
-                            <span>📡</span>
-                            模拟通关信号
-                        </button>
-                        <button class="btn" onclick="clearLog()">
-                            <span>🗑️</span>
-                            清空日志
-                        </button>
-                        <button class="btn secondary" onclick="showDebugInfo()">
-                            <span>🐞</span>
-                            调试信息
-                        </button>
-                        <button class="btn success" onclick="forceShowModal()">
-                            <span>🪟</span>
-                            测试弹窗
-                        </button>
-                        <button class="btn" onclick="resetGame()">
-                            <span>🔄</span>
-                            重置游戏
-                        </button>
+                <!-- 统计面板 -->
+                <div class="stats-panel">
+                    <h3 class="panel-title">📊 游戏统计</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Ruffle状态</div>
+                            <div class="stat-value" id="ruffleStatus">加载中...</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">连接状态</div>
+                            <div class="stat-value" id="connectionStatus">等待测试</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -539,10 +550,7 @@
         
         <!-- 日志区域 -->
         <div class="log-section">
-            <h3 class="log-title">
-                <span>📡</span>
-                信号监控日志
-            </h3>
+            <h3 class="log-title">📡 信号监控日志</h3>
             <div id="logContent" class="log-content">
                 <div class="log-entry info">[系统] 页面加载完成，等待操作...</div>
             </div>
@@ -550,7 +558,7 @@
         
         <!-- 页脚 -->
         <div class="footer">
-            <p>闪翼拳皇 1.91 - 格斗传承 | 测试系统 v2.0 | 使用Ruffle播放器加载Flash游戏</p>
+            <p>闪翼拳皇 1.91 - 格斗传承 | 测试系统 v3.0 | 使用Ruffle播放器加载Flash游戏</p>
             <p style="margin-top: 10px; color: #9999ff;">
                 <span>⚠️</span>
                 提示：游戏通关后会自动触发彩蛋视频，您可以选择观看或继续游戏
@@ -645,6 +653,20 @@
         }
         
         // ==================== 游戏控制 ====================
+        function initGame() {
+            addLog('Ruffle播放器已加载完成', 'success');
+            document.getElementById('ruffleStatus').textContent = '已加载';
+            
+            // 配置Ruffle
+            window.RufflePlayer = window.RufflePlayer || {};
+            window.RufflePlayer.config = {
+                "autoplay": "on",
+                "unmuteOverlay": "hidden",
+                "backgroundColor": "#000000",
+                "warnOnUnsupportedContent": false
+            };
+        }
+        
         async function loadGame() {
             addLog('正在初始化Ruffle播放器...', 'info');
             updateGameStatus('加载中');
@@ -656,15 +678,6 @@
             } else {
                 gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center;"><div style="font-size: 3em; margin-bottom: 15px;">⏳</div>游戏加载中，请稍候...</div>';
             }
-            
-            // 配置Ruffle
-            window.RufflePlayer = window.RufflePlayer || {};
-            window.RufflePlayer.config = {
-                "autoplay": "on",
-                "unmuteOverlay": "hidden",
-                "backgroundColor": "#000000",
-                "warnOnUnsupportedContent": false
-            };
             
             try {
                 addLog('尝试创建Ruffle播放器实例...', 'info');
@@ -678,41 +691,95 @@
                 // 原始直链
                 const originalUrl = 'https://file.wd02.com/dl/5b320d25d4c1f9faab3ec77f3603ddf2.swf';
                 
-                // 使用 CORS 代理
-                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(originalUrl);
+                // 多个CORS代理方案（按优先级尝试）
+                const corsProxies = [
+                    'https://api.allorigins.win/raw?url=',
+                    'https://corsproxy.io/?',
+                    'https://api.codetabs.com/v1/proxy/?quest=',
+                    'https://cors-anywhere.herokuapp.com/'
+                ];
                 
-                addLog(`通过CORS代理加载: ${proxyUrl}`, 'info');
+                // 尝试每个代理
+                let loadSuccess = false;
                 
-                // 通过代理加载游戏
-                await rufflePlayer.load({
-                    url: proxyUrl,
-                    width: 800,
-                    height: 500
-                });
+                for (let i = 0; i < corsProxies.length; i++) {
+                    const proxyUrl = corsProxies[i] + encodeURIComponent(originalUrl);
+                    addLog(`尝试通过代理${i+1}加载游戏...`, 'info');
+                    document.getElementById('connectionStatus').textContent = `尝试代理 ${i+1}`;
+                    
+                    try {
+                        // 设置超时
+                        const timeoutPromise = new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('加载超时')), 15000)
+                        );
+                        
+                        // 尝试加载
+                        const loadPromise = rufflePlayer.load({
+                            url: proxyUrl,
+                            width: 800,
+                            height: 500
+                        });
+                        
+                        await Promise.race([loadPromise, timeoutPromise]);
+                        
+                        addLog(`✅ 通过代理${i+1}加载成功！`, 'success');
+                        document.getElementById('connectionStatus').textContent = '连接成功';
+                        loadSuccess = true;
+                        break;
+                        
+                    } catch (proxyError) {
+                        addLog(`代理${i+1}失败: ${proxyError.message}`, 'warning');
+                    }
+                }
                 
-                addLog('✅ 游戏加载成功！请开始游戏。', 'success');
-                updateGameStatus('进行中');
-                gameStartTime = new Date();
-                startGameTimer();
+                if (loadSuccess) {
+                    addLog('✅ 游戏加载成功！请开始游戏。', 'success');
+                    updateGameStatus('进行中');
+                    gameStartTime = new Date();
+                    startGameTimer();
+                } else {
+                    throw new Error('所有CORS代理方案均失败');
+                }
                 
             } catch (error) {
                 addLog(`❌ 游戏加载失败: ${error.message}`, 'error');
+                
+                // 显示详细的错误信息和解决方案
                 gameScreen.innerHTML = `
-                    <div style="color:#ff6666; text-align:center; padding:50px;">
+                    <div style="color:#ff6666; text-align:center; padding:30px;">
                         <div style="font-size: 3em; margin-bottom: 20px;">❌</div>
                         <div style="font-size: 1.2em; margin-bottom: 10px;">游戏加载失败</div>
-                        <div style="color:#ff9999; margin-bottom: 20px;">${error.message}</div>
-                        <div style="margin-bottom: 10px;">CORS策略阻止了文件加载</div>
-                        <button onclick="loadGame()" style="
-                            padding: 10px 20px;
-                            background: #3366ff;
-                            color: white;
-                            border: none;
-                            border-radius: 5px;
-                            margin-top: 20px;
-                        ">重新加载</button>
+                        <div style="color:#ff9999; margin-bottom: 20px; text-align:left; padding: 0 20px;">
+                            <strong>原因分析:</strong><br>
+                            1. Ruffle播放器加载: ${window.RufflePlayer ? '✅ 已加载' : '❌ 未加载'}<br>
+                            2. CORS跨域问题: 文件服务器未允许跨域访问<br>
+                            3. 代理服务器: 尝试的代理可能被限制
+                        </div>
+                        <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                            <strong>解决方案:</strong><br>
+                            1. 尝试使用手机热点而非WiFi<br>
+                            2. 稍后再试（服务器可能临时故障）<br>
+                            3. 将SWF文件上传到GitHub仓库
+                        </div>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                            <button onclick="loadGame()" style="
+                                padding: 10px 20px;
+                                background: #3366ff;
+                                color: white;
+                                border: none;
+                                border-radius: 5px;
+                            ">🔄 重新加载</button>
+                            <button onclick="testSignal()" style="
+                                padding: 10px 20px;
+                                background: #ff3366;
+                                color: white;
+                                border: none;
+                                border-radius: 5px;
+                            ">📡 测试通关</button>
+                        </div>
                     </div>
                 `;
+                
                 updateGameStatus('加载失败');
             }
         }
