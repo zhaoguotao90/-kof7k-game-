@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>拳皇KOF7K - 通关解锁隐藏视频</title>
+    <title>闪翼拳皇 1.91 - 格斗传承（CDN加速版）</title>
     
-    <!-- 使用可靠的Ruffle CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.1.0-nightly.2024.1.20/ruffle.js"></script>
+    <!-- CDN预连接 -->
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdn.statically.io">
     
     <style>
         * {
@@ -16,8 +17,8 @@
         }
         
         body {
-            font-family: 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #0a0a2a, #1a1a3a);
+            font-family: 'Microsoft YaHei', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3a 100%);
             color: white;
             min-height: 100vh;
             overflow-x: hidden;
@@ -29,41 +30,133 @@
             padding: 20px;
         }
         
-        /* 头部 */
-        .header {
+        /* CDN加速提示条 */
+        .cdn-accelerated {
+            background: linear-gradient(to right, #1890ff, #096dd9);
+            color: white;
+            padding: 12px 15px;
             text-align: center;
-            padding: 20px 0;
-            border-bottom: 3px solid #ffcc00;
-            margin-bottom: 30px;
+            font-size: 0.95em;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 105, 255, 0.3);
         }
         
-        .title {
-            font-size: 2.5em;
-            background: linear-gradient(45deg, #ffcc00, #ff9900);
+        .cdn-accelerated::before {
+            content: "⚡";
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+        
+        /* 标题区域 */
+        .header {
+            text-align: center;
+            margin: 25px 0;
+            padding: 20px 0;
+            border-bottom: 3px solid #ffcc00;
+        }
+        
+        .main-title {
+            font-size: 3.2em;
+            background: linear-gradient(45deg, #ffcc00, #ff9900, #ffff00);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
             margin-bottom: 10px;
+            font-weight: bold;
+            letter-spacing: 2px;
         }
         
         .subtitle {
+            font-size: 1.8em;
             color: #4cdfff;
-            font-size: 1.3em;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(76, 223, 255, 0.5);
         }
         
-        /* 游戏容器 */
+        .version {
+            color: #ffcc00;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        
+        /* 主内容区域 */
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        /* 左侧信息区域 */
+        .info-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .game-intro {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #ff6600;
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
+        }
+        
+        .section-title {
+            color: #ffcc00;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .features {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .features li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ccccff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1em;
+        }
+        
+        .features li:before {
+            content: "★";
+            color: #ffcc00;
+            font-size: 1.2em;
+        }
+        
+        .update-info {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #33cc66;
+            box-shadow: 0 0 20px rgba(51, 204, 102, 0.3);
+        }
+        
+        /* 右侧游戏区域 */
+        .game-section {
+            flex: 1.5;
+            min-width: 300px;
+        }
+        
         .game-container {
             background: #000;
             border-radius: 15px;
             overflow: hidden;
-            margin-bottom: 20px;
-            border: 3px solid #ff3333;
             box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+            border: 3px solid #ff3333;
+            margin-bottom: 20px;
         }
         
-        #gameScreen {
+        .game-screen {
             width: 100%;
-            height: 450px;
+            height: 500px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -72,286 +165,701 @@
         
         /* 控制面板 */
         .control-panel {
-            text-align: center;
-            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 25px;
+            border: 2px solid #3366ff;
+            box-shadow: 0 0 20px rgba(51, 102, 255, 0.3);
         }
         
-        .game-btn {
-            display: inline-block;
-            padding: 15px 25px;
-            background: linear-gradient(135deg, #1890ff, #096dd9);
+        .control-title {
+            color: #4cdfff;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .control-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 12px 15px;
+            background: linear-gradient(135deg, #3366ff, #2244cc);
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
-            margin: 8px;
-            min-width: 180px;
-        }
-        
-        .game-btn:hover {
-            background: linear-gradient(135deg, #40a9ff, #096dd9);
-        }
-        
-        .game-btn.test {
-            background: linear-gradient(135deg, #52c41a, #389e0d);
-        }
-        
-        .game-btn.test:hover {
-            background: linear-gradient(135deg, #73d13d, #52c41a);
-        }
-        
-        /* 状态信息 */
-        .status-info {
+            transition: all 0.3s ease;
             text-align: center;
-            margin: 20px 0;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(51, 102, 255, 0.4);
+            background: linear-gradient(135deg, #4477ff, #3355dd);
+        }
+        
+        .btn.warning {
+            background: linear-gradient(135deg, #ff3366, #cc2255);
+        }
+        
+        .btn.warning:hover {
+            background: linear-gradient(135deg, #ff4477, #dd3366);
+        }
+        
+        .btn.success {
+            background: linear-gradient(135deg, #33cc66, #22aa44);
+        }
+        
+        .btn.success:hover {
+            background: linear-gradient(135deg, #44dd77, #33bb55);
+        }
+        
+        /* 状态统计 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .stat-label {
             color: #ccccff;
-            min-height: 24px;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            color: #4cdfff;
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+        
+        /* 日志区域 */
+        .log-section {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid #9933ff;
+            box-shadow: 0 0 20px rgba(153, 51, 255, 0.3);
+        }
+        
+        .log-title {
+            color: #cc99ff;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .log-content {
+            height: 180px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .log-entry.info { color: #4cdfff; }
+        .log-entry.success { color: #33cc66; font-weight: bold; }
+        .log-entry.warning { color: #ffcc00; }
+        .log-entry.error { color: #ff6666; }
+        
+        /* 模态窗口 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a4a, #0a0a2a);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            border: 3px solid #ff3333;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.5);
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ff0000, #ff9900);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+        
+        .modal-stats {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .choice-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .choice-btn {
+            padding: 18px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .choice-btn.video {
+            background: linear-gradient(135deg, #ff3366, #cc2255);
+            color: white;
+        }
+        
+        .choice-btn.continue {
+            background: linear-gradient(135deg, #33cc66, #22aa44);
+            color: white;
+        }
+        
+        .choice-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .countdown {
+            margin-top: 20px;
+            color: #ccccff;
+            font-size: 0.9em;
+        }
+        
+        /* 视频播放器 */
+        .video-player {
+            width: 90%;
+            max-width: 800px;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 3px solid #3366ff;
+        }
+        
+        .video-header {
+            background: rgba(51, 102, 255, 0.3);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .video-title {
+            font-size: 1.4em;
+            color: white;
+        }
+        
+        .close-video {
+            background: #ff3333;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            cursor: pointer;
         }
         
         /* 页脚 */
         .footer {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #9999ff;
+            color: #ccccff;
             font-size: 0.9em;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .control-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-title {
+                font-size: 2.5em;
+            }
+            
+            .subtitle {
+                font-size: 1.4em;
+            }
+            
+            .game-screen {
+                height: 400px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- CDN加速提示条 -->
+    <div class="cdn-accelerated">
+        已启用CDN加速，为您提供更快的游戏加载体验（无需VPN）
+    </div>
+    
     <div class="container">
-        <!-- 头部 -->
+        <!-- 标题区域 -->
         <div class="header">
-            <h1 class="title">拳皇KOF7K 通关挑战</h1>
-            <p class="subtitle">通关解锁隐藏视频</p>
+            <h1 class="main-title">拳皇KOF7K 通关测试</h1>
+            <h2 class="subtitle">闪翼拳皇 1.91 - 格斗传承</h2>
+            <div class="version">光效华丽升级 | 新角色-卢卡尔 | 部分人物Bug修正</div>
         </div>
         
-        <!-- 状态信息 -->
-        <div class="status-info">
-            <p id="loadStatus">系统准备就绪，点击下方按钮开始游戏</p>
-        </div>
-        
-        <!-- 游戏容器 -->
-        <div class="game-container">
-            <div id="gameScreen">
-                <div id="loadingText" style="text-align: center; color: #ccccff; padding: 20px;">
-                    <div style="font-size: 3em; margin-bottom: 15px;">🎮</div>
-                    <h2>拳皇KOF7K 格斗传承</h2>
-                    <p style="margin-top: 15px;">光效华丽升级 | 新角色-卢卡尔 | 部分人物Bug修正</p>
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 左侧信息区域 -->
+            <div class="info-section">
+                <!-- 游戏介绍 -->
+                <div class="game-intro">
+                    <h3 class="section-title">🎮 游戏特色</h3>
+                    <ul class="features">
+                        <li>光效华丽升级，视觉效果全面提升</li>
+                        <li>新角色-卢卡尔加入战斗</li>
+                        <li>部分人物Bug已经修正</li>
+                        <li>加入血量测试器(练习模式中)，重置功能</li>
+                        <li>此版本由拳皇wing资深玩家打造</li>
+                    </ul>
+                </div>
+                
+                <!-- 统计面板 -->
+                <div class="stats-panel">
+                    <h3 class="section-title">📊 游戏统计</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">通关次数</div>
+                            <div class="stat-value" id="victoryCount">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">当前状态</div>
+                            <div class="stat-value" id="gameStatus">未开始</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">玩家胜场</div>
+                            <div class="stat-value" id="playerWins">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">游戏时长</div>
+                            <div class="stat-value" id="gameTime">00:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧游戏区域 -->
+            <div class="game-section">
+                <!-- 游戏容器 -->
+                <div class="game-container">
+                    <div id="gameScreen" class="game-screen">
+                        <!-- Ruffle播放器将在这里加载游戏 -->
+                        <div id="loadingText" style="color: #ccccff; font-size: 1.2em; text-align: center;">
+                            <div style="font-size: 3em; margin-bottom: 15px;">🎮</div>
+                            游戏容器准备就绪<br>点击"加载游戏"开始
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 控制面板 -->
+                <div class="control-panel">
+                    <h3 class="control-title">
+                        <span>🎮</span>
+                        控制面板
+                    </h3>
+                    <div class="control-buttons">
+                        <button class="btn" onclick="loadGame()">
+                            <span>🔄</span>
+                            加载游戏
+                        </button>
+                        <button class="btn warning" onclick="testSignal()">
+                            <span>📡</span>
+                            模拟通关信号
+                        </button>
+                        <button class="btn" onclick="clearLog()">
+                            <span>🗑️</span>
+                            清空日志
+                        </button>
+                        <button class="btn secondary" onclick="showDebugInfo()">
+                            <span>🐞</span>
+                            调试信息
+                        </button>
+                        <button class="btn success" onclick="forceShowModal()">
+                            <span>🪟</span>
+                            测试弹窗
+                        </button>
+                        <button class="btn" onclick="resetGame()">
+                            <span>🔄</span>
+                            重置游戏
+                        </button>
+                    </div>
+                    
+                    <!-- 状态统计 -->
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">CDN状态</div>
+                            <div class="stat-value" id="cdnStatus">已启用</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">加载速度</div>
+                            <div class="stat-value" id="loadSpeed">--</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <!-- 控制面板 -->
-        <div class="control-panel">
-            <button class="game-btn" id="loadBtn">加载游戏</button>
-            <button class="game-btn test" id="testBtn">测试通关</button>
+        <!-- 日志区域 -->
+        <div class="log-section">
+            <h3 class="log-title">
+                <span>📡</span>
+                信号监控日志
+            </h3>
+            <div id="logContent" class="log-content">
+                <div class="log-entry info">[系统] 页面加载完成，等待操作...</div>
+            </div>
         </div>
         
         <!-- 页脚 -->
         <div class="footer">
-            <p>闪翼拳皇 1.91 - 格斗传承 | 使用Ruffle播放器加载Flash游戏</p>
-            <p style="margin-top: 8px;">提示：通关后可解锁隐藏彩蛋视频</p>
+            <p>闪翼拳皇 1.91 - 格斗传承 | CDN加速版 v1.0 | 使用Ruffle播放器加载Flash游戏</p>
+            <p style="margin-top: 10px; color: #9999ff;">
+                <span>⚠️</span>
+                提示：CDN加速已启用，无需VPN即可流畅游戏
+            </p>
         </div>
     </div>
     
-    <!-- 通关视频弹窗 -->
-    <div id="videoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center;">
-        <div style="background:#111; padding:20px; border-radius:10px; max-width:800px; width:90%;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="color:#ffcc00;">🎁 通关奖励 - 隐藏彩蛋视频</h3>
-                <button onclick="closeVideo()" style="background:#ff3333; color:white; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer;">×</button>
+    <!-- 通关选择弹窗 -->
+    <div id="victoryModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">🎉 恭喜通关！</h2>
+            <p style="color: #ccccff; font-size: 1.2em; margin-bottom: 20px;">您已成功击败所有对手，解锁隐藏彩蛋！</p>
+            
+            <div class="modal-stats">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div>
+                        <div style="color: #ccccff; font-size: 0.9em;">获胜方</div>
+                        <div style="color: #4cdfff; font-size: 1.5em; font-weight: bold;" id="modalWinner">玩家</div>
+                    </div>
+                    <div>
+                        <div style="color: #ccccff; font-size: 0.9em;">胜利回合</div>
+                        <div style="color: #4cdfff; font-size: 1.5em; font-weight: bold;" id="modalWins">2</div>
+                    </div>
+                    <div>
+                        <div style="color: #ccccff; font-size: 0.9em;">总局数</div>
+                        <div style="color: #4cdfff; font-size: 1.5em; font-weight: bold;" id="modalRounds">3</div>
+                    </div>
+                    <div>
+                        <div style="color: #ccccff; font-size: 0.9em;">检测时间</div>
+                        <div style="color: #4cdfff; font-size: 1.5em; font-weight: bold;" id="modalTime">--:--</div>
+                    </div>
+                </div>
             </div>
-            <video id="hiddenVideo" controls style="width:100%; border-radius:5px;">
+            
+            <div class="choice-buttons">
+                <button class="choice-btn video" onclick="showVideo()">
+                    <span>🎬</span>
+                    <span>观看彩蛋视频</span>
+                </button>
+                <button class="choice-btn continue" onclick="continueGame()">
+                    <span>🎮</span>
+                    <span>继续挑战 (更高难度)</span>
+                </button>
+            </div>
+            
+            <div class="countdown" id="countdown">10秒后自动选择继续游戏...</div>
+        </div>
+    </div>
+    
+    <!-- 视频播放器 -->
+    <div id="videoModal" class="modal">
+        <div class="video-player">
+            <div class="video-header">
+                <div class="video-title">
+                    <span>🎁</span>
+                    通关奖励 - 隐藏彩蛋视频
+                </div>
+                <button class="close-video" onclick="closeVideo()">×</button>
+            </div>
+            <video id="hiddenVideo" controls style="width:100%;">
                 <source src="reward_video.mp4" type="video/mp4">
-                您的浏览器不支持视频播放
+                您的浏览器不支持HTML5视频播放
             </video>
         </div>
     </div>
     
     <script>
-        // ==================== 修复核心：确保按钮事件绑定 ====================
-        
-        // 等待页面完全加载
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('页面已加载，开始初始化按钮事件...');
-            
-            // 获取按钮元素
-            const loadBtn = document.getElementById('loadBtn');
-            const testBtn = document.getElementById('testBtn');
-            
-            // 为加载游戏按钮添加事件监听
-            loadBtn.addEventListener('click', function() {
-                console.log('"加载游戏"按钮被点击');
-                document.getElementById('loadStatus').textContent = '正在加载游戏...';
-                loadGame();
-            });
-            
-            // 为测试通关按钮添加事件监听
-            testBtn.addEventListener('click', function() {
-                console.log('"测试通关"按钮被点击');
-                document.getElementById('loadStatus').textContent = '测试通关功能...';
-                testVictory();
-            });
-            
-            console.log('按钮事件绑定完成');
-            
-            // 初始化Ruffle配置
-            if (window.RufflePlayer) {
-                window.RufflePlayer.config = {
-                    "autoplay": "on",
-                    "unmuteOverlay": "hidden",
-                    "backgroundColor": "#000000"
-                };
-                console.log('Ruffle配置完成');
-            }
-            
-            // 检查是否已通关
-            if (localStorage.getItem('kof_victory') === 'true') {
-                console.log('检测到之前的通关状态');
-                handleVictory();
-            }
-        });
-        
-        // ==================== 游戏功能函数 ====================
+        // ==================== 全局变量 ====================
         let rufflePlayer = null;
-        let isGameLoaded = false;
-        let isVictory = false;
+        let gameStartTime = null;
+        let victoryCount = 0;
+        let countdownTimer = null;
+        let countdownValue = 10;
+        let gameStatus = '未开始';
+        let gameTimer = null;
+        let loadStartTime = null;
         
+        // ==================== CDN加速核心 ====================
+        // 启用CDN加速
+        function enableCDNAcceleration() {
+            // CDN加速链接
+            const cdnUrls = [
+                "https://cdn.jsdelivr.net/gh/赵国涛90/-kof7k-游戏-@main/test.html",
+                "https://cdn.statically.io/gh/赵国涛90/-kof7k-游戏-/main/test.html"
+            ];
+            
+            // 创建隐藏iframe预加载CDN资源
+            const preloadIframe = document.createElement('iframe');
+            preloadIframe.src = cdnUrls[0]; // 使用第一个CDN
+            preloadIframe.style.display = 'none';
+            document.body.appendChild(preloadIframe);
+            
+            addLog('CDN加速已启用: ' + cdnUrls[0], 'success');
+        }
+        
+        // 测量加载速度
+        function measureLoadSpeed() {
+            if (!loadStartTime) return;
+            
+            const loadTime = Date.now() - loadStartTime;
+            document.getElementById('loadSpeed').textContent = loadTime + 'ms';
+            addLog('游戏加载时间: ' + loadTime + 'ms', 'info');
+        }
+        
+        // ==================== 日志系统 ====================
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('logContent');
+            const time = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${time}] ${message}`;
+            log.appendChild(logEntry);
+            log.scrollTop = log.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        function clearLog() {
+            const log = document.getElementById('logContent');
+            log.innerHTML = '<div class="log-entry info">[系统] 日志已清空 ' + new Date().toLocaleTimeString() + '</div>';
+        }
+        
+        // ==================== 游戏控制 ====================
         async function loadGame() {
-            console.log('开始加载游戏...');
+            loadStartTime = Date.now();
+            addLog('正在初始化Ruffle播放器...', 'info');
+            updateGameStatus('加载中');
             
+            // 移除旧的播放器
             const gameScreen = document.getElementById('gameScreen');
-            const loadBtn = document.getElementById('loadBtn');
-            const loadStatus = document.getElementById('loadStatus');
+            if (rufflePlayer) {
+                gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center;"><div style="font-size: 3em; margin-bottom: 15px;">🔄</div>游戏重新加载中...</div>';
+            } else {
+                gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center;"><div style="font-size: 3em; margin-bottom: 15px;">⏳</div>游戏加载中，请稍候...</div>';
+            }
             
-            // 更新按钮状态
-            loadBtn.disabled = true;
-            loadBtn.textContent = '加载中...';
+            // 配置Ruffle
+            window.RufflePlayer = window.RufflePlayer || {};
+            window.RufflePlayer.config = {
+                "autoplay": "on",
+                "unmuteOverlay": "hidden",
+                "backgroundColor": "#000000",
+                "warnOnUnsupportedContent": false
+            };
             
             try {
-                // 1. 检查Ruffle播放器
-                console.log('检查Ruffle播放器状态...');
-                
-                if (!window.RufflePlayer) {
-                    throw new Error('Ruffle播放器未加载，请刷新页面重试');
-                }
-                
-                if (!window.RufflePlayer.newest) {
-                    throw new Error('Ruffle播放器版本不兼容');
-                }
-                
-                // 2. 创建游戏容器
-                gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center; padding:40px;">游戏加载中，请稍候...</div>';
-                loadStatus.textContent = '正在加载游戏文件...';
-                
-                // 3. 创建Ruffle播放器实例
-                console.log('创建Ruffle播放器实例...');
+                addLog('尝试创建Ruffle播放器实例...', 'info');
                 const ruffle = window.RufflePlayer.newest();
                 rufflePlayer = ruffle.createPlayer();
                 gameScreen.innerHTML = '';
                 gameScreen.appendChild(rufflePlayer);
                 
-                // 4. 加载游戏文件
-                console.log('开始加载游戏文件...');
+                addLog('播放器创建成功，开始加载游戏文件...', 'info');
                 
-                // 使用CDN链接
-                const gameUrl = "https://cdn.jsdelivr.net/gh/zhaoguotao90/-kof7k-游戏-@main/kof7k_modified.swf";
-                console.log('游戏文件URL:', gameUrl);
+                // 使用CDN加速链接
+                const cdnUrl = "https://cdn.jsdelivr.net/gh/赵国涛90/-kof7k-游戏-@main/kof7k_modified.swf";
                 
-                // 设置超时
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('游戏加载超时')), 10000)
-                );
-                
-                // 游戏加载
-                const loadPromise = rufflePlayer.load({
-                    url: gameUrl,
-                    width: "100%",
-                    height: 450
+                await rufflePlayer.load({
+                    url: cdnUrl,
+                    width: 800,
+                    height: 500
                 });
                 
-                await Promise.race([loadPromise, timeoutPromise]);
-                
-                // 5. 加载成功
-                console.log('游戏加载成功！');
-                loadStatus.textContent = '✅ 游戏加载成功！请开始游戏。';
-                loadBtn.textContent = '重新加载游戏';
-                loadBtn.disabled = false;
-                isGameLoaded = true;
-                
-                // 设置通关监听
-                setupVictoryListener();
+                addLog('✅ 游戏加载成功！请开始游戏。', 'success');
+                updateGameStatus('进行中');
+                gameStartTime = new Date();
+                startGameTimer();
+                measureLoadSpeed();
                 
             } catch (error) {
-                console.error('加载失败:', error);
-                loadStatus.textContent = '❌ 游戏加载失败: ' + error.message;
-                loadBtn.textContent = '重新加载';
-                loadBtn.disabled = false;
-                
-                // 显示错误信息
+                addLog(`❌ 游戏加载失败: ${error.message}`, 'error');
                 gameScreen.innerHTML = `
-                    <div style="color:#ff6666; text-align:center; padding:40px;">
-                        <div style="font-size:3em; margin-bottom:15px;">❌</div>
-                        <h3>游戏加载失败</h3>
-                        <p>${error.message}</p>
-                        <p style="color:#ff9999; margin-top:15px;">请检查网络连接后重试</p>
+                    <div style="color:#ff6666; text-align:center; padding:50px;">
+                        <div style="font-size: 3em; margin-bottom: 20px;">❌</div>
+                        <div style="font-size: 1.2em; margin-bottom: 10px;">游戏加载失败</div>
+                        <div style="color:#ff9999; margin-bottom: 20px;">${error.message}</div>
+                        <button onclick="loadGame()" style="
+                            padding: 10px 20px;
+                            background: #3366ff;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            margin-top: 20px;
+                        ">重新加载</button>
                     </div>
                 `;
+                updateGameStatus('加载失败');
             }
         }
         
-        function setupVictoryListener() {
-            console.log('设置通关监听器...');
-            
-            // 监听消息事件
-            window.addEventListener("message", (event) => {
-                if (event.data && event.data.type === "GAME_VICTORY") {
-                    console.log('收到通关消息');
-                    handleVictory();
+        // ==================== 信号监听 ====================
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type) {
+                console.log('收到消息:', event.data);
+                addLog(`收到信号: ${event.data.type}`, 'info');
+                
+                if (event.data.type.includes('VICTORY') || 
+                    event.data.type.includes('WIN') ||
+                    event.data.type.includes('COMPLETE')) {
+                    
+                    handleVictorySignal(event.data);
                 }
-            });
+            }
+        });
+        
+        // ==================== 通关处理 ====================
+        function handleVictorySignal(gameData) {
+            victoryCount++;
+            updateVictoryCount();
             
-            // 外部接口回调
-            window.onGameVictory = function() {
-                console.log('通过回调收到通关');
-                handleVictory();
-            };
+            addLog(`🎉 第${victoryCount}次通关！类型: ${gameData.type}`, 'success');
+            
+            // 更新模态窗口信息
+            document.getElementById('modalWinner').textContent = 
+                (gameData.winner === 'PLAYER_VICTORY' || gameData.winner === 'PLAYER') ? '玩家' : '电脑';
+            document.getElementById('modalWins').textContent = gameData.playerWins || 2;
+            document.getElementById('modalRounds').textContent = gameData.roundMax || 3;
+            document.getElementById('modalTime').textContent = new Date().toLocaleTimeString();
+            
+            // 显示通关弹窗
+            showVictoryModal();
         }
         
-        function handleVictory() {
-            if (isVictory) return;
+        // ==================== 弹窗控制 ====================
+        function showVictoryModal() {
+            const modal = document.getElementById('victoryModal');
+            modal.style.display = 'flex';
+            addLog('通关选择弹窗已显示', 'info');
             
-            console.log('处理通关...');
-            isVictory = true;
-            document.getElementById('loadStatus').textContent = '🎉 恭喜通关！可以观看隐藏视频了';
-            
-            // 创建视频按钮
-            const videoBtn = document.createElement('button');
-            videoBtn.className = 'game-btn';
-            videoBtn.style.background = 'linear-gradient(135deg, #ff3366, #cc2255)';
-            videoBtn.textContent = '观看通关视频';
-            videoBtn.onclick = showVideo;
-            
-            document.querySelector('.control-panel').appendChild(videoBtn);
-            
-            // 保存通关状态
-            localStorage.setItem('kof_victory', 'true');
+            startCountdown();
         }
         
+        function hideVictoryModal() {
+            const modal = document.getElementById('victoryModal');
+            modal.style.display = 'none';
+            clearCountdown();
+        }
+        
+        function startCountdown() {
+            countdownValue = 10;
+            const countdownElement = document.getElementById('countdown');
+            countdownElement.textContent = `${countdownValue}秒后自动选择继续游戏...`;
+            
+            countdownTimer = setInterval(() => {
+                countdownValue--;
+                countdownElement.textContent = `${countdownValue}秒后自动选择继续游戏...`;
+                
+                if (countdownValue <= 0) {
+                    clearInterval(countdownTimer);
+                    autoContinueGame();
+                }
+            }, 1000);
+        }
+        
+        function clearCountdown() {
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+        }
+        
+        function autoContinueGame() {
+            addLog('倒计时结束，自动选择继续游戏', 'warning');
+            continueGame();
+        }
+        
+        // ==================== 用户选择 ====================
         function showVideo() {
-            console.log('显示通关视频');
+            addLog('用户选择观看彩蛋视频', 'info');
+            hideVictoryModal();
+            
             const videoModal = document.getElementById('videoModal');
             const video = document.getElementById('hiddenVideo');
             
             videoModal.style.display = 'flex';
-            video.play().catch(e => {
-                console.error('视频播放失败:', e);
-                alert('视频播放失败，请确保视频文件存在');
+            
+            video.play().catch(error => {
+                addLog(`视频播放失败: ${error.message}`, 'warning');
             });
+            
+            video.onended = function() {
+                setTimeout(() => {
+                    closeVideo();
+                    addLog('彩蛋视频播放完成', 'info');
+                }, 1000);
+            };
         }
         
         function closeVideo() {
@@ -363,10 +871,145 @@
             videoModal.style.display = 'none';
         }
         
-        function testVictory() {
-            console.log('测试通关功能');
-            handleVictory();
+        function continueGame() {
+            addLog('用户选择继续游戏', 'info');
+            hideVictoryModal();
+            
+            // 重新加载游戏
+            if (rufflePlayer) {
+                const cdnUrl = "https://cdn.jsdelivr.net/gh/赵国涛90/-kof7k-游戏-@main/kof7k_modified.swf";
+                rufflePlayer.load({
+                    url: cdnUrl,
+                    width: 800,
+                    height: 500
+                });
+                addLog('游戏已重新加载，开始新的一轮', 'info');
+            }
+            
+            // 显示提示
+            setTimeout(() => {
+                const msg = document.createElement('div');
+                msg.innerHTML = '<div style="font-size: 2em; margin-bottom: 10px;">🔥</div>难度已提升！准备迎接挑战！';
+                msg.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: linear-gradient(45deg, #ff3366, #cc2255);
+                    color: white;
+                    padding: 20px 40px;
+                    border-radius: 10px;
+                    z-index: 9999;
+                    box-shadow: 0 5px 20px rgba(255,0,0,0.3);
+                    font-size: 1.2em;
+                    text-align: center;
+                `;
+                document.body.appendChild(msg);
+                
+                setTimeout(() => {
+                    msg.style.opacity = '0';
+                    setTimeout(() => {
+                        if (msg.parentNode) {
+                            document.body.removeChild(msg);
+                        }
+                    }, 500);
+                }, 3000);
+            }, 300);
         }
+        
+        // ==================== 工具函数 ====================
+        function startGameTimer() {
+            if (gameTimer) {
+                clearInterval(gameTimer);
+            }
+            
+            gameTimer = setInterval(() => {
+                if (gameStartTime) {
+                    const now = new Date();
+                    const diff = Math.floor((now - gameStartTime) / 1000);
+                    const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+                    const seconds = (diff % 60).toString().padStart(2, '0');
+                    document.getElementById('gameTime').textContent = `${minutes}:${seconds}`;
+                }
+            }, 1000);
+        }
+        
+        function updateVictoryCount() {
+            document.getElementById('victoryCount').textContent = victoryCount;
+        }
+        
+        function updateGameStatus(status) {
+            gameStatus = status;
+            document.getElementById('gameStatus').textContent = status;
+        }
+        
+        function updatePlayerWins(wins) {
+            document.getElementById('playerWins').textContent = wins || 0;
+        }
+        
+        // ==================== 测试函数 ====================
+        function testSignal() {
+            addLog('手动触发模拟通关信号...', 'warning');
+            
+            window.postMessage({
+                type: 'KOF_GAME_VICTORY',
+                winner: 'PLAYER_VICTORY',
+                playerWins: 2,
+                roundMax: 3
+            }, '*');
+            
+            addLog('测试信号已发送', 'success');
+        }
+        
+        function showDebugInfo() {
+            addLog('=== 调试信息 ===', 'info');
+            addLog(`游戏状态: ${gameStatus}`, 'info');
+            addLog(`通关次数: ${victoryCount}`, 'info');
+            addLog(`Ruffle播放器: ${rufflePlayer ? '已加载' : '未加载'}`, 'info');
+        }
+        
+        function forceShowModal() {
+            addLog('强制显示通关弹窗', 'warning');
+            testSignal();
+        }
+        
+        function resetGame() {
+            victoryCount = 0;
+            updateVictoryCount();
+            updatePlayerWins(0);
+            updateGameStatus('未开始');
+            gameStartTime = null;
+            document.getElementById('gameTime').textContent = '00:00';
+            document.getElementById('loadSpeed').textContent = '--';
+            
+            if (gameTimer) {
+                clearInterval(gameTimer);
+                gameTimer = null;
+            }
+            
+            if (rufflePlayer) {
+                const gameScreen = document.getElementById('gameScreen');
+                gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center;"><div style="font-size: 3em; margin-bottom: 15px;">🔄</div>游戏已重置<br>点击"加载游戏"重新开始</div>';
+                rufflePlayer = null;
+            }
+            
+            addLog('游戏状态已重置', 'info');
+        }
+        
+        // ==================== 初始化 ====================
+        window.addEventListener('DOMContentLoaded', () => {
+            addLog('闪翼拳皇 1.91 格斗传承测试系统已启动', 'success');
+            addLog('CDN加速已自动启用', 'success');
+            addLog('请点击"加载游戏"按钮开始游戏', 'info');
+            
+            // 初始化统计
+            updateVictoryCount();
+            updatePlayerWins(0);
+            updateGameStatus('未开始');
+            
+            // 启用CDN加速
+            enableCDNAcceleration();
+        });
     </script>
 </body>
 </html>
