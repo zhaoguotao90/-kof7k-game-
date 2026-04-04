@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>拳皇KOF7K - 通关解锁隐藏视频</title>
+    
+    <!-- 使用可靠的Ruffle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.1.0-nightly.2024.1.20/ruffle.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -90,6 +94,14 @@
             background: linear-gradient(135deg, #40a9ff, #096dd9);
         }
         
+        .game-btn.test {
+            background: linear-gradient(135deg, #52c41a, #389e0d);
+        }
+        
+        .game-btn.test:hover {
+            background: linear-gradient(135deg, #73d13d, #52c41a);
+        }
+        
         /* 状态信息 */
         .status-info {
             text-align: center;
@@ -97,20 +109,18 @@
             color: #ccccff;
         }
         
-        /* 错误提示 */
-        .error-message {
-            display: none;
-            background: rgba(255, 77, 79, 0.1);
-            border: 2px solid #ff4d4f;
+        /* 调试信息 */
+        .debug-info {
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             margin: 20px 0;
-            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
         }
         
-        .error-title {
-            color: #ff4d4f;
-            font-size: 1.5em;
+        .debug-title {
+            color: #ffcc00;
             margin-bottom: 10px;
         }
         
@@ -123,47 +133,6 @@
             color: #9999ff;
         }
     </style>
-    
-    <!-- Ruffle加载脚本 - 多CDN备份 -->
-    <script>
-        // 多个Ruffle CDN源，按优先级尝试
-        const ruffleSources = [
-            'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.1.0-nightly.2024.1.20/ruffle.js',
-            'https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2024.1.20/ruffle.js',
-            'https://cdn.bootcdn.net/ajax/libs/ruffle/0.1.0/ruffle.js',
-            'https://cdn.statically.io/gh/ruffle-rs/ruffle/master/ruffle.js'
-        ];
-        
-        // 动态加载Ruffle
-        function loadRuffle() {
-            return new Promise((resolve, reject) => {
-                let currentSource = 0;
-                
-                function tryLoad() {
-                    if (currentSource >= ruffleSources.length) {
-                        reject(new Error('所有Ruffle源加载失败'));
-                        return;
-                    }
-                    
-                    const script = document.createElement('script');
-                    script.src = ruffleSources[currentSource];
-                    script.onload = () => {
-                        console.log('Ruffle加载成功:', ruffleSources[currentSource]);
-                        resolve();
-                    };
-                    script.onerror = () => {
-                        console.warn('Ruffle源失败:', ruffleSources[currentSource]);
-                        currentSource++;
-                        setTimeout(tryLoad, 1000);
-                    };
-                    
-                    document.head.appendChild(script);
-                }
-                
-                tryLoad();
-            });
-        }
-    </script>
 </head>
 <body>
     <div class="container">
@@ -175,7 +144,7 @@
         
         <!-- 状态信息 -->
         <div class="status-info">
-            <p id="loadStatus">准备加载游戏...</p>
+            <p id="loadStatus">系统准备就绪，点击下方按钮开始游戏</p>
         </div>
         
         <!-- 游戏容器 -->
@@ -184,7 +153,7 @@
                 <div id="loadingText" style="text-align: center; color: #ccccff; padding: 30px;">
                     <div style="font-size: 3em; margin-bottom: 20px;">🎮</div>
                     <h2>拳皇KOF7K 格斗传承</h2>
-                    <p style="margin-top: 20px;">光效华丽升级 | 新角色-卢卡尔 | 部分人物Bug修正</p>
+                    <p style="margin-top: 20px;">光效华丽升级   新角色-卢卡尔   部分人物Bug修正</p>
                 </div>
             </div>
         </div>
@@ -194,23 +163,20 @@
             <button class="game-btn" onclick="loadGame()" id="loadBtn">
                 加载游戏
             </button>
-            <button class="game-btn" onclick="testVictory()" style="background: linear-gradient(135deg, #52c41a, #389e0d);">
+            <button class="game-btn test" onclick="testVictory()">
                 测试通关
             </button>
         </div>
         
-        <!-- 错误提示 -->
-        <div id="errorMessage" class="error-message">
-            <h3 class="error-title">游戏加载失败</h3>
-            <p id="errorDetail"></p>
-            <button class="game-btn" onclick="retryLoad()" style="margin-top: 15px;">
-                重新加载
-            </button>
+        <!-- 调试信息 -->
+        <div class="debug-info">
+            <div class="debug-title">系统状态</div>
+            <div id="debugOutput">等待操作...</div>
         </div>
         
         <!-- 页脚 -->
         <div class="footer">
-            <p>闪翼拳皇 1.91 - 格斗传承 | 使用Ruffle播放器加载Flash游戏</p>
+            <p>闪翼拳皇 1.91 - 格斗传承   使用Ruffle播放器加载Flash游戏</p>
             <p style="margin-top: 10px;">提示：通关后可解锁隐藏彩蛋视频</p>
         </div>
     </div>
@@ -235,8 +201,18 @@
         let isGameLoaded = false;
         let isVictory = false;
         
+        // ==================== 调试输出函数 ====================
+        function debugLog(message) {
+            const debugOutput = document.getElementById('debugOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            debugOutput.innerHTML = `[${timestamp}] ${message}<br>` + debugOutput.innerHTML;
+            console.log(`[DEBUG] ${message}`);
+        }
+        
         // ==================== 游戏加载函数 ====================
         async function loadGame() {
+            debugLog('点击了"加载游戏"按钮');
+            
             const gameScreen = document.getElementById('gameScreen');
             const loadBtn = document.getElementById('loadBtn');
             const loadStatus = document.getElementById('loadStatus');
@@ -247,41 +223,53 @@
             loadBtn.textContent = '加载中...';
             
             try {
-                // 1. 加载Ruffle播放器
-                if (!window.RufflePlayer || !window.RufflePlayer.newest) {
-                    await loadRuffle();
-                    // 等待Ruffle初始化
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                // 1. 检查Ruffle播放器
+                debugLog('检查Ruffle播放器状态...');
+                
+                if (!window.RufflePlayer) {
+                    throw new Error('RufflePlayer对象不存在');
                 }
                 
-                if (!window.RufflePlayer || !window.RufflePlayer.newest) {
-                    throw new Error('Ruffle播放器加载失败');
+                if (!window.RufflePlayer.newest) {
+                    throw new Error('RufflePlayer.newest函数不存在');
                 }
                 
+                debugLog('Ruffle播放器检查通过');
                 loadStatus.textContent = 'Ruffle加载成功，正在加载游戏...';
                 
                 // 2. 创建游戏容器
                 gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center; padding:50px;">游戏加载中，请稍候...</div>';
                 
                 // 3. 创建Ruffle播放器实例
+                debugLog('创建Ruffle播放器实例...');
                 const ruffle = window.RufflePlayer.newest();
                 rufflePlayer = ruffle.createPlayer();
                 gameScreen.innerHTML = '';
                 gameScreen.appendChild(rufflePlayer);
                 
                 // 4. 加载游戏文件
-                loadStatus.textContent = '正在加载游戏文件...';
+                debugLog('加载游戏文件...');
                 
-                // 使用国内CDN链接
+                // 使用直接的游戏文件链接
                 const gameUrl = "https://cdn.jsdelivr.net/gh/zhaoguotao90/-kof7k-游戏-@main/kof7k_modified.swf";
+                debugLog(`游戏文件URL: ${gameUrl}`);
                 
-                await rufflePlayer.load({
+                // 设置超时
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('游戏加载超时（15秒）')), 15000)
+                );
+                
+                // 游戏加载
+                const loadPromise = rufflePlayer.load({
                     url: gameUrl,
                     width: "100%",
                     height: 500
                 });
                 
+                await Promise.race([loadPromise, timeoutPromise]);
+                
                 // 5. 加载成功
+                debugLog('游戏加载成功！');
                 loadStatus.textContent = '✅ 游戏加载成功！请开始游戏。';
                 loadBtn.textContent = '重新加载游戏';
                 loadBtn.disabled = false;
@@ -290,60 +278,66 @@
                 // 6. 设置通关监听
                 setupVictoryListener();
                 
-                // 隐藏错误信息
-                document.getElementById('errorMessage').style.display = 'none';
-                
             } catch (error) {
-                // 处理错误
-                showError('游戏加载失败: ' + error.message);
+                debugLog(`加载失败: ${error.message}`);
                 loadStatus.textContent = '❌ 游戏加载失败';
                 loadBtn.textContent = '重新加载';
                 loadBtn.disabled = false;
+                
+                // 显示详细错误
+                gameScreen.innerHTML = `
+                    <div style="color:#ff6666; text-align:center; padding:50px;">
+                        <div style="font-size:3em; margin-bottom:20px;">❌</div>
+                        <h3>游戏加载失败</h3>
+                        <p>${error.message}</p>
+                        <p style="color:#ff9999; margin-top:20px;">请检查网络连接后重试</p>
+                        <button onclick="loadGame()" style="
+                            padding: 10px 20px;
+                            background: #3366ff;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            margin-top: 20px;
+                        ">重新加载</button>
+                    </div>
+                `;
             }
-        }
-        
-        // ==================== 错误处理 ====================
-        function showError(message) {
-            document.getElementById('errorDetail').textContent = message;
-            document.getElementById('errorMessage').style.display = 'block';
-            console.error('游戏错误:', message);
-        }
-        
-        function retryLoad() {
-            document.getElementById('errorMessage').style.display = 'none';
-            loadGame();
         }
         
         // ==================== 通关处理 ====================
         function setupVictoryListener() {
+            debugLog('设置通关监听器...');
+            
             // 方法1：监听消息事件
             window.addEventListener("message", (event) => {
                 if (event.data && event.data.type === "GAME_VICTORY") {
+                    debugLog('收到通关消息');
                     handleVictory();
                 }
             });
             
             // 方法2：外部接口回调
             window.onGameVictory = function() {
+                debugLog('通过onGameVictory回调收到通关');
                 handleVictory();
             };
             
-            // 方法3：定时检查（备用）
-            setInterval(() => {
-                if (window.GAME_VICTORY_FLAG) {
-                    handleVictory();
-                    window.GAME_VICTORY_FLAG = false;
-                }
-            }, 1000);
+            // 方法3：通过URL参数检测
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('victory')) {
+                debugLog('通过URL参数检测到通关');
+                handleVictory();
+            }
         }
         
         function handleVictory() {
             if (isVictory) return;
             
+            debugLog('处理通关...');
             isVictory = true;
             document.getElementById('loadStatus').textContent = '🎉 恭喜通关！点击下方按钮观看隐藏视频';
             
-            // 显示视频按钮
+            // 创建视频按钮
             const videoBtn = document.createElement('button');
             videoBtn.className = 'game-btn';
             videoBtn.style.background = 'linear-gradient(135deg, #ff3366, #cc2255)';
@@ -357,13 +351,14 @@
         }
         
         function showVideo() {
+            debugLog('显示通关视频');
             const videoModal = document.getElementById('videoModal');
             const video = document.getElementById('hiddenVideo');
             
             videoModal.style.display = 'flex';
             video.play().catch(e => {
-                console.error('视频播放失败:', e);
-                alert('视频播放失败，请确保reward_video.mp4文件存在');
+                debugLog(`视频播放失败: ${e.message}`);
+                alert('视频播放失败，请确保视频文件存在');
             });
         }
         
@@ -371,31 +366,36 @@
             const videoModal = document.getElementById('videoModal');
             const video = document.getElementById('hiddenVideo');
             
-            video.pause();video.pause();
-            video.currentTime = 0;video.currentTime = 0;
-            videoModal.style.display = 'none';videoModal.style.display = 'none';
+            video.pause();
+            video.currentTime = 0;
+            videoModal.style.display = 'none';
         }
         
         // ==================== 测试功能 ====================
-        function testVictory() {function testVictory() {                handleVictory();            handleVictory();testVictory() {
-            handleVictory();handleVictory();
+        function testVictory() {
+            debugLog('点击了"测试通关"按钮');
+            handleVictory();
         }
         
         // ==================== 初始化 ====================
         window.addEventListener('DOMContentLoaded', () => {window.addEventListener('DOMContentLoaded', () => {
+            debugLog('页面加载完成');debugLog('页面加载完成');
+            
             // 检查是否已通关
             if (localStorage.getItem('kof_victory') === 'true') {if (localStorage.getItem('kof_victory') === 'true') {
+                debugLog('检测到之前的通关状态');debugLog('检测到之前的通关状态');
                 handleVictory();handleVictory();
             }
             
-            // 自动尝试加载Ruffle// 自动尝试加载Ruffle
-            setTimeout(() => {setTimeout(() => {
-                if (!window.RufflePlayer) {if (!window.RufflePlayer) {
-                    loadRuffle().catch(() => {loadRuffle().catch(() => {
-                        console.log('Ruffle预加载失败，将在点击加载游戏时重试');console.log('Ruffle预加载失败，将在点击加载游戏时重试');
-                    });
-                }
-            }, 1000);
+            // 初始化Ruffle配置// 初始化Ruffle配置
+            if (window.RufflePlayer) {if (window.RufflePlayer) {
+                window.RufflePlayer.config = {window.RufflePlayer.config = {
+                    "autoplay": "on","autoplay": "on",
+                    "unmuteOverlay": "hidden","unmuteOverlay": "hidden",
+                    "backgroundColor": "#000000""backgroundColor": "#000000"
+                };
+                debugLog('Ruffle配置完成');debugLog('Ruffle配置完成');
+            }
         });
     </script>
 </body>
