@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>拳皇KOF7K - NFC通关挑战</title>
-    
-    <!-- 国内CDN加速 -->
-    <script src="https://cdn.bootcdn.net/ajax/libs/ruffle/0.1.0/ruffle.js"></script>
+    <title>拳皇KOF7K - 通关解锁隐藏视频</title>
     <style>
         * {
             margin: 0;
@@ -16,33 +13,38 @@
         
         body {
             font-family: 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #1a1a4a, #0a0a2a);
+            background: linear-gradient(135deg, #0a0a2a, #1a1a3a);
             color: white;
             min-height: 100vh;
             overflow-x: hidden;
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
         
-        /* NFC提示条 */
-        .nfc-banner {
-            background: linear-gradient(to right, #1890ff, #096dd9);
-            color: white;
-            padding: 15px;
+        /* 头部 */
+        .header {
             text-align: center;
-            font-size: 1.1em;
-            border-radius: 0 0 10px 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0, 105, 255, 0.3);
+            padding: 20px 0;
+            border-bottom: 3px solid #ffcc00;
+            margin-bottom: 30px;
         }
         
-        .nfc-banner span {
-            font-size: 1.3em;
-            margin-right: 10px;
+        .title {
+            font-size: 2.8em;
+            background: linear-gradient(45deg, #ffcc00, #ff9900);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #4cdfff;
+            font-size: 1.4em;
         }
         
         /* 游戏容器 */
@@ -66,88 +68,114 @@
         
         /* 控制面板 */
         .control-panel {
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 2px solid #3366ff;
-        }
-        
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #3366ff, #2244cc);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            cursor: pointer;
-            text-align: center;
-        }
-        
-        .btn:hover {
-            background: linear-gradient(135deg, #4477ff, #3355dd);
-        }
-        
-        /* 通关提示 */
-        .victory-message {
-            display: none;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
-            padding: 30px;
             text-align: center;
             margin: 20px 0;
-            border: 2px solid #ffcc00;
         }
         
-        .victory-title {
-            font-size: 2.5em;
-            color: #ffcc00;
-            margin-bottom: 20px;
-        }
-        
-        .video-btn {
-            background: linear-gradient(135deg, #ff3366, #cc2255);
-            color: white;
+        .game-btn {
+            display: inline-block;
             padding: 15px 30px;
+            background: linear-gradient(135deg, #1890ff, #096dd9);
+            color: white;
             border: none;
-            border-radius: 50px;
+            border-radius: 10px;
             font-size: 1.2em;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+            margin: 10px;
+            min-width: 200px;
         }
         
-        /* 视频播放器 */
-        #videoPlayer {
+        .game-btn:hover {
+            background: linear-gradient(135deg, #40a9ff, #096dd9);
+        }
+        
+        /* 状态信息 */
+        .status-info {
+            text-align: center;
+            margin: 20px 0;
+            color: #ccccff;
+        }
+        
+        /* 错误提示 */
+        .error-message {
             display: none;
-            width: 100%;
-            margin-top: 20px;
+            background: rgba(255, 77, 79, 0.1);
+            border: 2px solid #ff4d4f;
             border-radius: 10px;
-            overflow: hidden;
-            border: 3px solid #33cc66;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .error-title {
+            color: #ff4d4f;
+            font-size: 1.5em;
+            margin-bottom: 10px;
         }
         
         /* 页脚 */
         .footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             color: #9999ff;
-            font-size: 0.9em;
         }
     </style>
+    
+    <!-- Ruffle加载脚本 - 多CDN备份 -->
+    <script>
+        // 多个Ruffle CDN源，按优先级尝试
+        const ruffleSources = [
+            'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.1.0-nightly.2024.1.20/ruffle.js',
+            'https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2024.1.20/ruffle.js',
+            'https://cdn.bootcdn.net/ajax/libs/ruffle/0.1.0/ruffle.js',
+            'https://cdn.statically.io/gh/ruffle-rs/ruffle/master/ruffle.js'
+        ];
+        
+        // 动态加载Ruffle
+        function loadRuffle() {
+            return new Promise((resolve, reject) => {
+                let currentSource = 0;
+                
+                function tryLoad() {
+                    if (currentSource >= ruffleSources.length) {
+                        reject(new Error('所有Ruffle源加载失败'));
+                        return;
+                    }
+                    
+                    const script = document.createElement('script');
+                    script.src = ruffleSources[currentSource];
+                    script.onload = () => {
+                        console.log('Ruffle加载成功:', ruffleSources[currentSource]);
+                        resolve();
+                    };
+                    script.onerror = () => {
+                        console.warn('Ruffle源失败:', ruffleSources[currentSource]);
+                        currentSource++;
+                        setTimeout(tryLoad, 1000);
+                    };
+                    
+                    document.head.appendChild(script);
+                }
+                
+                tryLoad();
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="container">
-        <!-- NFC提示条 -->
-        <div class="nfc-banner">
-            <span>📱</span> 已通过NFC标签进入游戏 - 挑战通关解锁隐藏视频
+        <!-- 头部 -->
+        <div class="header">
+            <h1 class="title">拳皇KOF7K 通关挑战</h1>
+            <p class="subtitle">通关解锁隐藏视频</p>
+        </div>
+        
+        <!-- 状态信息 -->
+        <div class="status-info">
+            <p id="loadStatus">准备加载游戏...</p>
         </div>
         
         <!-- 游戏容器 -->
@@ -155,75 +183,97 @@
             <div id="gameScreen">
                 <div id="loadingText" style="text-align: center; color: #ccccff; padding: 30px;">
                     <div style="font-size: 3em; margin-bottom: 20px;">🎮</div>
-                    <h2>拳皇KOF7K 通关挑战</h2>
-                    <p style="margin-top: 20px;">触碰NFC标签开始游戏</p>
-                    <button class="btn" onclick="loadGame()" style="margin-top: 30px;">
-                        加载游戏
-                    </button>
+                    <h2>拳皇KOF7K 格斗传承</h2>
+                    <p style="margin-top: 20px;">光效华丽升级 | 新角色-卢卡尔 | 部分人物Bug修正</p>
                 </div>
             </div>
         </div>
         
         <!-- 控制面板 -->
         <div class="control-panel">
-            <button class="btn" onclick="testVictory()">
-                模拟通关（测试用）
+            <button class="game-btn" onclick="loadGame()" id="loadBtn">
+                加载游戏
+            </button>
+            <button class="game-btn" onclick="testVictory()" style="background: linear-gradient(135deg, #52c41a, #389e0d);">
+                测试通关
             </button>
         </div>
         
-        <!-- 通关提示 -->
-        <div id="victoryMessage" class="victory-message">
-            <h2 class="victory-title">🎉 恭喜通关！</h2>
-            <p style="font-size: 1.2em; margin-bottom: 20px;">
-                您已成功击败所有对手，解锁隐藏彩蛋视频！
-            </p>
-            <button class="video-btn" onclick="showVideo()">
-                观看通关视频
+        <!-- 错误提示 -->
+        <div id="errorMessage" class="error-message">
+            <h3 class="error-title">游戏加载失败</h3>
+            <p id="errorDetail"></p>
+            <button class="game-btn" onclick="retryLoad()" style="margin-top: 15px;">
+                重新加载
             </button>
-        </div>
-        
-        <!-- 视频播放器 -->
-        <div id="videoPlayer">
-            <video controls style="width:100%;">
-                <source src="reward_video.mp4" type="video/mp4">
-                您的浏览器不支持视频播放
-            </video>
         </div>
         
         <!-- 页脚 -->
         <div class="footer">
-            <p>拳皇KOF7K - NFC通关挑战系统 | 使用Ruffle播放器</p>
-            <p style="margin-top: 10px;">提示：通关后视频将自动解锁</p>
+            <p>闪翼拳皇 1.91 - 格斗传承 | 使用Ruffle播放器加载Flash游戏</p>
+            <p style="margin-top: 10px;">提示：通关后可解锁隐藏彩蛋视频</p>
+        </div>
+    </div>
+    
+    <!-- 通关视频弹窗 -->
+    <div id="videoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center;">
+        <div style="background:#111; padding:20px; border-radius:10px; max-width:800px; width:90%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="color:#ffcc00;">🎁 通关奖励 - 隐藏彩蛋视频</h3>
+                <button onclick="closeVideo()" style="background:#ff3333; color:white; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer;">×</button>
+            </div>
+            <video id="hiddenVideo" controls style="width:100%; border-radius:5px;">
+                <source src="reward_video.mp4" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
         </div>
     </div>
     
     <script>
-        // ==================== 核心功能 ====================
+        // ==================== 全局变量 ====================
         let rufflePlayer = null;
         let isGameLoaded = false;
-        let isVictoryAchieved = false;
+        let isVictory = false;
         
-        // 加载游戏
+        // ==================== 游戏加载函数 ====================
         async function loadGame() {
             const gameScreen = document.getElementById('gameScreen');
-            gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center; padding:50px;"><div style="font-size:3em; margin-bottom:20px;">⏳</div>游戏加载中，请稍候...</div>';
+            const loadBtn = document.getElementById('loadBtn');
+            const loadStatus = document.getElementById('loadStatus');
+            
+            // 更新状态
+            loadStatus.textContent = '正在加载Ruffle播放器...';
+            loadBtn.disabled = true;
+            loadBtn.textContent = '加载中...';
             
             try {
-                // 使用国内CDN加载游戏
-                const gameUrl = "https://cdn.jsdelivr.net/gh/赵国涛90/-kof7k-游戏-@main/kof7k_modified.swf";
+                // 1. 加载Ruffle播放器
+                if (!window.RufflePlayer || !window.RufflePlayer.newest) {
+                    await loadRuffle();
+                    // 等待Ruffle初始化
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
                 
-                // 配置Ruffle
-                window.RufflePlayer = window.RufflePlayer || {};
-                window.RufflePlayer.config = {
-                    "autoplay": "on",
-                    "unmuteOverlay": "hidden",
-                    "backgroundColor": "#000000"
-                };
+                if (!window.RufflePlayer || !window.RufflePlayer.newest) {
+                    throw new Error('Ruffle播放器加载失败');
+                }
                 
+                loadStatus.textContent = 'Ruffle加载成功，正在加载游戏...';
+                
+                // 2. 创建游戏容器
+                gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center; padding:50px;">游戏加载中，请稍候...</div>';
+                
+                // 3. 创建Ruffle播放器实例
                 const ruffle = window.RufflePlayer.newest();
                 rufflePlayer = ruffle.createPlayer();
                 gameScreen.innerHTML = '';
                 gameScreen.appendChild(rufflePlayer);
+                
+                // 4. 加载游戏文件
+                loadStatus.textContent = '正在加载游戏文件...';
+                
+                // 使用国内CDN链接
+                const gameUrl = "https://cdn.jsdelivr.net/gh/zhaoguotao90/-kof7k-游戏-@main/kof7k_modified.swf";
                 
                 await rufflePlayer.load({
                     url: gameUrl,
@@ -231,32 +281,40 @@
                     height: 500
                 });
                 
+                // 5. 加载成功
+                loadStatus.textContent = '✅ 游戏加载成功！请开始游戏。';
+                loadBtn.textContent = '重新加载游戏';
+                loadBtn.disabled = false;
                 isGameLoaded = true;
-                document.getElementById('loadingText').style.display = 'none';
                 
-                // 监听通关信号
+                // 6. 设置通关监听
                 setupVictoryListener();
                 
+                // 隐藏错误信息
+                document.getElementById('errorMessage').style.display = 'none';
+                
             } catch (error) {
-                gameScreen.innerHTML = `
-                    <div style="color:#ff6666; text-align:center; padding:50px;">
-                        <div style="font-size:3em; margin-bottom:20px;">❌</div>
-                        <h3>游戏加载失败</h3>
-                        <p>${error.message}</p>
-                        <button onclick="loadGame()" style="
-                            padding: 10px 20px;
-                            background: #3366ff;
-                            color: white;
-                            border: none;
-                            border-radius: 5px;
-                            margin-top: 20px;
-                        ">重新加载</button>
-                    </div>
-                `;
+                // 处理错误
+                showError('游戏加载失败: ' + error.message);
+                loadStatus.textContent = '❌ 游戏加载失败';
+                loadBtn.textContent = '重新加载';
+                loadBtn.disabled = false;
             }
         }
         
-        // 设置通关监听
+        // ==================== 错误处理 ====================
+        function showError(message) {
+            document.getElementById('errorDetail').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+            console.error('游戏错误:', message);
+        }
+        
+        function retryLoad() {
+            document.getElementById('errorMessage').style.display = 'none';
+            loadGame();
+        }
+        
+        // ==================== 通关处理 ====================
         function setupVictoryListener() {
             // 方法1：监听消息事件
             window.addEventListener("message", (event) => {
@@ -265,55 +323,79 @@
                 }
             });
             
-            // 方法2：设置回调函数
+            // 方法2：外部接口回调
             window.onGameVictory = function() {
                 handleVictory();
             };
+            
+            // 方法3：定时检查（备用）
+            setInterval(() => {
+                if (window.GAME_VICTORY_FLAG) {
+                    handleVictory();
+                    window.GAME_VICTORY_FLAG = false;
+                }
+            }, 1000);
         }
         
-        // 处理通关
         function handleVictory() {
-            if (isVictoryAchieved) return;
+            if (isVictory) return;
             
-            isVictoryAchieved = true;
-            document.getElementById('victoryMessage').style.display = 'block';
+            isVictory = true;
+            document.getElementById('loadStatus').textContent = '🎉 恭喜通关！点击下方按钮观看隐藏视频';
+            
+            // 显示视频按钮
+            const videoBtn = document.createElement('button');
+            videoBtn.className = 'game-btn';
+            videoBtn.style.background = 'linear-gradient(135deg, #ff3366, #cc2255)';
+            videoBtn.textContent = '观看通关视频';
+            videoBtn.onclick = showVideo;
+            
+            document.querySelector('.control-panel').appendChild(videoBtn);
             
             // 保存通关状态
-            localStorage.setItem('kof7k_victory', 'achieved');
+            localStorage.setItem('kof_victory', 'true');
         }
         
-        // 显示视频
         function showVideo() {
-            document.getElementById('videoPlayer').style.display = 'block';
-            document.querySelector('#videoPlayer video').play();
+            const videoModal = document.getElementById('videoModal');
+            const video = document.getElementById('hiddenVideo');
+            
+            videoModal.style.display = 'flex';
+            video.play().catch(e => {
+                console.error('视频播放失败:', e);
+                alert('视频播放失败，请确保reward_video.mp4文件存在');
+            });
         }
         
-        // 测试通关
-        function testVictory() {
-            handleVictory();
+        function closeVideo() {
+            const videoModal = document.getElementById('videoModal');
+            const video = document.getElementById('hiddenVideo');
+            
+            video.pause();video.pause();
+            video.currentTime = 0;video.currentTime = 0;
+            videoModal.style.display = 'none';videoModal.style.display = 'none';
         }
         
-        // ==================== NFC功能 ====================
-        // 检查是否来自NFC
-        function checkNFCReferrer() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('nfc')) {
-                document.querySelector('.nfc-banner').style.display = 'block';
-            }
+        // ==================== 测试功能 ====================
+        function testVictory() {function testVictory() {                handleVictory();            handleVictory();testVictory() {
+            handleVictory();handleVictory();
         }
         
         // ==================== 初始化 ====================
-        window.addEventListener('DOMContentLoaded', () => {
-            // 检查是否来自NFC
-            checkNFCReferrer();
-            
+        window.addEventListener('DOMContentLoaded', () => {window.addEventListener('DOMContentLoaded', () => {
             // 检查是否已通关
-            if (localStorage.getItem('kof7k_victory') === 'achieved') {
-                document.getElementById('victoryMessage').style.display = 'block';
+            if (localStorage.getItem('kof_victory') === 'true') {if (localStorage.getItem('kof_victory') === 'true') {
+                handleVictory();handleVictory();
             }
             
-            // 自动加载游戏（可选）
-            // setTimeout(loadGame, 1000);
+            // 自动尝试加载Ruffle// 自动尝试加载Ruffle
+            setTimeout(() => {setTimeout(() => {
+                if (!window.RufflePlayer) {if (!window.RufflePlayer) {
+                    loadRuffle().catch(() => {loadRuffle().catch(() => {
+                        console.log('Ruffle预加载失败，将在点击加载游戏时重试');console.log('Ruffle预加载失败，将在点击加载游戏时重试');
+                    });
+                }
+            }, 1000);
         });
     </script>
 </body>
