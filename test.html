@@ -4,131 +4,266 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>拳皇KOF7K - 阿里云OSS版</title>
-    
-    <!-- 使用阿里云CDN加速Ruffle -->
-    <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.1.0-nightly.2024.1.20/ruffle.js"></script>
-    
+    <!-- 修复1：补全Ruffle播放器CDN链接 -->
+    <script src="https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2024.1.20/ruffle.js"></script>
     <style>
-        /* 原有CSS样式保持不变 */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
             font-family: 'Microsoft YaHei', sans-serif;
             background: linear-gradient(135deg, #0a0a2a, #1a1a3a);
-            color: white; min-height: 100vh;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; padding: 20px 0; border-bottom: 3px solid #ffcc00; margin-bottom: 30px; }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 3px solid #ffcc00;
+            margin-bottom: 30px;
+        }
+        
         .title {
-            font-size: 2.5em;
+            font-size: 2.8em;
             background: linear-gradient(45deg, #ffcc00, #ff9900);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
         }
-        /* ...其他样式保持不变... */
+        
+        .subtitle {
+            color: #4cdfff;
+            font-size: 1.4em;
+        }
+        
+        .game-container {
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 3px solid #ff3333;
+        }
+        
+        #gameScreen {
+            width: 100%;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #111;
+        }
+        
+        .control-panel {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .game-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #1890ff, #096dd9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 180px;
+        }
+        
+        .game-btn:hover {
+            background: linear-gradient(135deg, #40a9ff, #096dd9);
+        }
+        
+        .status-info {
+            text-align: center;
+            margin: 20px 0;
+            color: #ccccff;
+            min-height: 24px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #9999ff;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">拳皇KOF7K 阿里云OSS版</h1>
+            <h1 class="title">拳皇KOF7K 通关挑战</h1>
             <p class="subtitle">触碰NFC标签开始游戏</p>
         </div>
         
-        <!-- 游戏容器 -->
+        <div class="status-info">
+            <p id="loadStatus">✅ 系统就绪，点击加载游戏</p>
+        </div>
+        
         <div class="game-container">
             <div id="gameScreen">
-                <!-- 初始加载提示 -->
+                <div id="loadingText" style="text-align: center; color: #ccccff; padding: 30px;">
+                    <div style="font-size: 3em; margin-bottom: 20px;">🎮</div>
+                    <h2>拳皇KOF7K 格斗传承</h2>
+                    <p style="margin-top: 20px;">光效华丽升级 | 新角色-卢卡尔 | 部分人物Bug修正</p>
+                </div>
             </div>
         </div>
         
-        <!-- 控制面板 -->
         <div class="control-panel">
             <button class="game-btn" id="loadBtn">加载游戏</button>
+            <button class="game-btn" id="testBtn" style="background: linear-gradient(135deg, #52c41a, #389e0d);">测试通关</button>
+        </div>
+        
+        <div class="footer">
+            <p>闪翼拳皇 1.91 - 格斗传承 | 使用Ruffle播放器加载Flash游戏</p>
         </div>
     </div>
     
     <!-- 通关视频弹窗 -->
-    <div id="videoModal" style="display:none;">
-        <!-- 弹窗结构保持不变 -->
+    <div id="videoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center;">
+        <div style="background:#111; padding:20px; border-radius:10px; max-width:800px; width:90%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="color:#ffcc00;">🎁 通关奖励 - 隐藏彩蛋视频</h3>
+                <button onclick="closeVideo()" style="background:#ff3333; color:white; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer;">×</button>
+            </div>
+            <video id="hiddenVideo" controls style="width:100%; border-radius:5px;">
+                <!-- 修复2：使用正确的OSS视频外链 -->
+                <source src="https://kof7k-game.oss-cn-zhongwei.aliyuncs.com/reward_video.mp4" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
+        </div>
     </div>
     
     <script>
-        // ==================== 阿里云OSS资源配置 ====================
+        // ==================== 全局变量 ====================
+        let rufflePlayer = null;
+        let isGameLoaded = false;
+        let isVictory = false;
+        
+        // 修复3：使用正确的OSS资源URL
         const OSS_BASE_URL = "https://kof7k-game.oss-cn-zhongwei.aliyuncs.com/";
         const GAME_FILE_URL = OSS_BASE_URL + "kof7k_modified.swf";
         const REWARD_VIDEO_URL = OSS_BASE_URL + "reward_video.mp4";
         
-        // ==================== 游戏初始化 ====================
+        // ==================== 页面初始化 ====================
         document.addEventListener('DOMContentLoaded', function() {
             const loadBtn = document.getElementById('loadBtn');
-            loadBtn.addEventListener('click', loadGame);
+            const testBtn = document.getElementById('testBtn');
             
-            // 自动加载游戏（可选）
-            setTimeout(loadGame, 1000);
+            loadBtn.addEventListener('click', loadGame);
+            testBtn.addEventListener('click', testVictory);
+            
+            // 设置视频源
+            document.getElementById('hiddenVideo').querySelector('source').src = REWARD_VIDEO_URL;
         });
         
         // ==================== 游戏加载函数 ====================
         async function loadGame() {
-            // 获取DOM元素
             const gameScreen = document.getElementById('gameScreen');
             const loadBtn = document.getElementById('loadBtn');
+            const loadStatus = document.getElementById('loadStatus');
             
-            // 更新UI状态
             loadBtn.disabled = true;
             loadBtn.textContent = '加载中...';
+            loadStatus.textContent = '正在加载游戏...';
             
             try {
-                // 创建Ruffle播放器
-                gameScreen.innerHTML = '<div>正在加载游戏引擎...</div>';
-                const ruffle = window.RufflePlayer.newest();
-                const player = ruffle.createPlayer();
-                gameScreen.appendChild(player);
+                // 检查Ruffle播放器
+                if (!window.RufflePlayer || !window.RufflePlayer.newest) {
+                    throw new Error('Ruffle播放器未加载');
+                }
                 
-                // 加载阿里云OSS上的游戏文件
-                await player.load({
+                // 创建游戏容器
+                gameScreen.innerHTML = '<div style="color:#ccccff; text-align:center; padding:50px;">游戏加载中，请稍候...</div>';
+                
+                // 创建Ruffle播放器实例
+                const ruffle = window.RufflePlayer.newest();
+                rufflePlayer = ruffle.createPlayer();
+                gameScreen.innerHTML = '';
+                gameScreen.appendChild(rufflePlayer);
+                
+                // 加载游戏文件（使用OSS外链）
+                await rufflePlayer.load({
                     url: GAME_FILE_URL,
                     width: "100%",
                     height: 500
                 });
                 
                 // 加载成功
-                loadBtn.textContent = '重新加载';
+                loadStatus.textContent = '✅ 游戏加载成功！请开始游戏';
+                loadBtn.textContent = '重新加载游戏';
                 loadBtn.disabled = false;
-                
-                // 保存播放器实例
-                window.rufflePlayer = player;
+                isGameLoaded = true;
                 
             } catch (error) {
                 console.error('加载失败:', error);
-                gameScreen.innerHTML = `
-                    <div style="color:#ff6666; text-align:center; padding:40px;">
-                        <h3>游戏加载失败</h3>
-                        <p>${error.message}</p>
-                        <button onclick="loadGame()" class="game-btn">重试</button>
-                    </div>
-                `;
+                loadStatus.textContent = '❌ 游戏加载失败: ' + error.message;
                 loadBtn.textContent = '重新加载';
                 loadBtn.disabled = false;
+                
+                gameScreen.innerHTML = `
+                    <div style="color:#ff6666; text-align:center; padding:40px;">
+                        <div style="font-size:3em; margin-bottom:15px;">❌</div>
+                        <h3>游戏加载失败</h3>
+                        <p>${error.message}</p>
+                        <button onclick="loadGame()" class="game-btn" style="margin-top:20px;">
+                            重新加载
+                        </button>
+                    </div>
+                `;
             }
         }
         
         // ==================== 通关系统 ====================
-        function handleVictory() {
+        function testVictory() {
+            // 模拟通关逻辑
+            document.getElementById('loadStatus').textContent = '🎉 恭喜通关！点击下方按钮观看隐藏视频';
+            
             // 创建视频按钮
             const videoBtn = document.createElement('button');
             videoBtn.className = 'game-btn';
             videoBtn.style.background = 'linear-gradient(135deg, #ff3366, #cc2255)';
             videoBtn.textContent = '观看通关视频';
-            videoBtn.onclick = () => {
-                document.getElementById('hiddenVideo').src = REWARD_VIDEO_URL;
-                document.getElementById('videoModal').style.display = 'flex';
-            };
+            videoBtn.onclick = showVideo;
+            
             document.querySelector('.control-panel').appendChild(videoBtn);
         }
         
-        // 监听通关事件
-        window.addEventListener("message", (event) => {
-            if (event.data?.type === "GAME_VICTORY") handleVictory();
-        });
+        function showVideo() {
+            const modal = document.getElementById('videoModal');
+            const video = document.getElementById('hiddenVideo');
+            
+            modal.style.display = 'flex';
+            video.play().catch(e => {
+                console.log('视频播放失败:', e);
+                alert('视频播放失败，请确保视频文件存在');
+            });
+        }
+        
+        function closeVideo() {
+            const modal = document.getElementById('videoModal');
+            const video = document.getElementById('hiddenVideo');
+            
+            video.pause();
+            video.currentTime = 0;
+            modal.style.display = 'none';
+        }
     </script>
 </body>
 </html>
