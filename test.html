@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>拳皇KOF7K - 阿里云OSS版</title>
-    
-    <!-- 使用稳定版Ruffle播放器 -->
-    <script src="https://unpkg.com/@ruffle-rs/ruffle@0.1.0/ruffle.js"></script>
-    
+    <!-- 修复1：补全Ruffle播放器CDN链接 -->
+    <script src="https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2024.1.20/ruffle.js"></script>
     <style>
         * {
             margin: 0;
@@ -60,7 +58,7 @@
         
         #gameScreen {
             width: 100%;
-            height: 600px;
+            height: 500px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -74,7 +72,7 @@
         
         .game-btn {
             display: inline-block;
-            padding: 12px 25px;
+            padding: 15px 30px;
             background: linear-gradient(135deg, #1890ff, #096dd9);
             color: white;
             border: none;
@@ -83,7 +81,7 @@
             font-weight: bold;
             cursor: pointer;
             margin: 10px;
-            min-width: 160px;
+            min-width: 180px;
         }
         
         .game-btn:hover {
@@ -95,27 +93,6 @@
             margin: 20px 0;
             color: #ccccff;
             min-height: 24px;
-        }
-        
-        .mobile-controls {
-            display: none;
-            padding: 15px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        
-        .virtual-btn {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #ff9900, #ff6600);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1em;
-            font-weight: bold;
-            margin: 5px;
-            cursor: pointer;
         }
         
         .footer {
@@ -148,19 +125,6 @@
             </div>
         </div>
         
-        <div class="mobile-controls" id="mobileControls">
-            <p style="color:#ffcc00; margin-bottom:10px;">手机用户请使用虚拟按键：</p>
-            <button class="virtual-btn" onclick="simulateKey('ArrowUp')">↑ 上</button>
-            <button class="virtual-btn" onclick="simulateKey('ArrowDown')">↓ 下</button>
-            <button class="virtual-btn" onclick="simulateKey('ArrowLeft')">← 左</button>
-            <button class="virtual-btn" onclick="simulateKey('ArrowRight')">→ 右</button>
-            <br>
-            <button class="virtual-btn" onclick="simulateKey('KeyA')" style="background:linear-gradient(135deg, #ff3366, #cc2255);">A 轻拳</button>
-            <button class="virtual-btn" onclick="simulateKey('KeyB')" style="background:linear-gradient(135deg, #ff3366, #cc2255);">B 重拳</button>
-            <button class="virtual-btn" onclick="simulateKey('KeyC')" style="background:linear-gradient(135deg, #ff3366, #cc2255);">C 轻脚</button>
-            <button class="virtual-btn" onclick="simulateKey('KeyD')" style="background:linear-gradient(135deg, #ff3366, #cc2255);">D 重脚</button>
-        </div>
-        
         <div class="control-panel">
             <button class="game-btn" id="loadBtn">加载游戏</button>
             <button class="game-btn" id="testBtn" style="background: linear-gradient(135deg, #52c41a, #389e0d);">测试通关</button>
@@ -171,16 +135,33 @@
         </div>
     </div>
     
+    <!-- 通关视频弹窗 -->
+    <div id="videoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center;">
+        <div style="background:#111; padding:20px; border-radius:10px; max-width:800px; width:90%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="color:#ffcc00;">🎁 通关奖励 - 隐藏彩蛋视频</h3>
+                <button onclick="closeVideo()" style="background:#ff3333; color:white; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer;">×</button>
+            </div>
+            <video id="hiddenVideo" controls style="width:100%; border-radius:5px;">
+                <!-- 修复2：使用正确的OSS视频外链 -->
+                <source src="https://kof7k-game.oss-cn-zhongwei.aliyuncs.com/reward_video.mp4" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
+        </div>
+    </div>
+    
     <script>
-        // 全局变量
+        // ==================== 全局变量 ====================
         let rufflePlayer = null;
         let isGameLoaded = false;
+        let isVictory = false;
         
-        // 使用您的阿里云OSS域名
+        // 修复3：使用正确的OSS资源URL
         const OSS_BASE_URL = "https://kof7k-game.oss-cn-zhongwei.aliyuncs.com/";
         const GAME_FILE_URL = OSS_BASE_URL + "kof7k_modified.swf";
+        const REWARD_VIDEO_URL = OSS_BASE_URL + "reward_video.mp4";
         
-        // 页面初始化
+        // ==================== 页面初始化 ====================
         document.addEventListener('DOMContentLoaded', function() {
             const loadBtn = document.getElementById('loadBtn');
             const testBtn = document.getElementById('testBtn');
@@ -188,13 +169,11 @@
             loadBtn.addEventListener('click', loadGame);
             testBtn.addEventListener('click', testVictory);
             
-            // 检测移动设备
-            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                document.getElementById('mobileControls').style.display = 'block';
-            }
+            // 设置视频源
+            document.getElementById('hiddenVideo').querySelector('source').src = REWARD_VIDEO_URL;
         });
         
-        // 游戏加载函数
+        // ==================== 游戏加载函数 ====================
         async function loadGame() {
             const gameScreen = document.getElementById('gameScreen');
             const loadBtn = document.getElementById('loadBtn');
@@ -219,11 +198,11 @@
                 gameScreen.innerHTML = '';
                 gameScreen.appendChild(rufflePlayer);
                 
-                // 加载游戏文件
+                // 加载游戏文件（使用OSS外链）
                 await rufflePlayer.load({
                     url: GAME_FILE_URL,
                     width: "100%",
-                    height: 600
+                    height: 500
                 });
                 
                 // 加载成功
@@ -241,38 +220,18 @@
                 gameScreen.innerHTML = `
                     <div style="color:#ff6666; text-align:center; padding:40px;">
                         <div style="font-size:3em; margin-bottom:15px;">❌</div>
-                        <h3>出了些问题 :(</h3>
-                        <p>Ruffle 无法加载 Flash SWF 文件。</p>
-                        <p>获取权限可能被 CORS 策略阻止。</p>
-                        <p style="color:#ccccff; font-size:0.9em;">请确保已正确配置阿里云OSS的CORS规则。</p>
+                        <h3>游戏加载失败</h3>
+                        <p>${error.message}</p>
                         <button onclick="loadGame()" class="game-btn" style="margin-top:20px;">
-                            重新加载游戏
+                            重新加载
                         </button>
                     </div>
                 `;
             }
         }
         
-        // 虚拟按键功能
-        function simulateKey(key) {
-            if (!rufflePlayer) return;
-            
-            const event = new KeyboardEvent('keydown', { key: key });
-            rufflePlayer.dispatchEvent(event);
-            
-            setTimeout(() => {
-                const eventUp = new KeyboardEvent('keyup', { key: key });
-                rufflePlayer.dispatchEvent(eventUp);
-            }, 100);
-        }
-        
-        // 通关系统
+        // ==================== 通关系统 ====================
         function testVictory() {
-            if (!isGameLoaded) {
-                alert('请先加载游戏');
-                return;
-            }
-            
             // 模拟通关逻辑
             document.getElementById('loadStatus').textContent = '🎉 恭喜通关！点击下方按钮观看隐藏视频';
             
@@ -287,8 +246,23 @@
         }
         
         function showVideo() {
-            const videoUrl = OSS_BASE_URL + "reward_video.mp4";
-            window.open(videoUrl, '_blank');
+            const modal = document.getElementById('videoModal');
+            const video = document.getElementById('hiddenVideo');
+            
+            modal.style.display = 'flex';
+            video.play().catch(e => {
+                console.log('视频播放失败:', e);
+                alert('视频播放失败，请确保视频文件存在');
+            });
+        }
+        
+        function closeVideo() {
+            const modal = document.getElementById('videoModal');
+            const video = document.getElementById('hiddenVideo');
+            
+            video.pause();
+            video.currentTime = 0;
+            modal.style.display = 'none';
         }
     </script>
 </body>
