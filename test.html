@@ -1,507 +1,429 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>拳皇KOF7K 终极优化版 - 支持虚拟按键</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:#000;color:#fff;font-family:"Microsoft Yahei",sans-serif;overflow:hidden;touch-action:none;}
-
-/* 顶部状态栏 */
-#status-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, #8B0000, #B22222);
-    padding: 10px 15px;
-    font-size: 0.9rem;
-    z-index: 1000;
-    border-bottom: 2px solid #FFD700;
-    text-align: center;
-}
-#game-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #FFD700;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}
-
-/* 游戏容器 */
-#game-container {
-    width: 100vw;
-    height: 60vh; /* 调整为60%高度，留出按键空间 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    margin-top: 50px;
-}
-
-/* 虚拟按键区域 - 玩家1 */
-#player1-controls {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 50%;
-    height: 40vh;
-    display: grid;
-    grid-template-areas: 
-        "w w w"
-        "a s d"
-        "u i o"
-        "j k l";
-    gap: 15px;
-    padding: 20px;
-    z-index: 999;
-}
-
-/* 虚拟按键区域 - 玩家2 */
-#player2-controls {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    width: 50%;
-    height: 40vh;
-    display: grid;
-    grid-template-areas: 
-        "up up up"
-        "left down right"
-        "num1 num2 num3"
-        "num4 num5 num6";
-    gap: 15px;
-    padding: 20px;
-    z-index: 999;
-}
-
-/* 通用按键样式 */
-.virtual-key {
-    background: linear-gradient(145deg, #444, #222);
-    border: 3px solid #666;
-    border-radius: 20px;
-    color: white;
-    font-size: 1.8rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-    touch-action: none;
-    cursor: pointer;
-    box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-    transition: all 0.1s;
-    min-height: 70px;
-}
-
-/* 按键按下效果 */
-.virtual-key.active {
-    background: linear-gradient(145deg, #666, #444);
-    transform: translateY(4px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    border-color: #FFD700;
-}
-
-/* 方向键特殊样式 */
-.directional { background: linear-gradient(145deg, #2E8B57, #228B22); }
-.action-key { background: linear-gradient(145deg, #8B0000, #B22222); }
-.confirm-key { background: linear-gradient(145deg, #FF8C00, #FFA500); }
-
-/* 按键标签 */
-.key-label {
-    font-size: 1rem;
-    position: absolute;
-    bottom: 5px;
-    color: #FFD700;
-    opacity: 0.8;
-}
-
-/* 具体按键位置 */
-/* 玩家1 - WASD */
-.key-w { grid-area: w; }
-.key-a { grid-area: a; }
-.key-s { grid-area: s; }
-.key-d { grid-area: d; }
-
-/* 玩家1 - UIOP */
-.key-u { grid-area: u; }
-.key-i { grid-area: i; }
-.key-o { grid-area: o; }
-
-/* 玩家1 - JKL */
-.key-j { grid-area: j; }
-.key-k { grid-area: k; }
-.key-l { grid-area: l; }
-
-/* 玩家2 - 方向键 */
-.key-up { grid-area: up; }
-.key-left { grid-area: left; }
-.key-down { grid-area: down; }
-.key-right { grid-area: right; }
-
-/* 玩家2 - 数字键 */
-.key-1 { grid-area: num1; }
-.key-2 { grid-area: num2; }
-.key-3 { grid-area: num3; }
-.key-4 { grid-area: num4; }
-.key-5 { grid-area: num5; }
-.key-6 { grid-area: num6; }
-
-/* 视频奖励 */
-#reward-video {
-    display: none;
-    width: 100vw;
-    height: 100vh;
-    object-fit: contain;
-    background: #000;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1001;
-}
-
-#close-btn {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1002;
-    background: #ff4444;
-    color: #fff;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    display: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-/* 控制面板切换 */
-#controls-toggle {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    background: rgba(0,0,0,0.7);
-    color: white;
-    border: 2px solid #FFD700;
-    border-radius: 8px;
-    padding: 8px 12px;
-    cursor: pointer;
-    z-index: 1003;
-    font-size: 0.9rem;
-}
-
-/* 操作说明 */
-#instructions {
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    background: rgba(0,0,0,0.8);
-    padding: 10px;
-    text-align: center;
-    font-size: 0.9rem;
-    color: #FFD700;
-    z-index: 999;
-    border-bottom: 1px solid #444;
-}
-
-/* 按键提示 */
-.control-hint {
-    position: fixed;
-    bottom: 10px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    color: #aaa;
-    font-size: 0.8rem;
-    padding: 5px;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-    .virtual-key {
-        font-size: 1.5rem;
-        min-height: 60px;
-        border-radius: 15px;
-    }
-    
-    #game-container {
-        height: 50vh;
-    }
-    
-    #player1-controls,
-    #player2-controls {
-        height: 50vh;
-        gap: 10px;
-        padding: 15px;
-    }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>拳皇KOF7K - Base64分块加载版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: "Microsoft Yahei", sans-serif;
+            overflow: hidden;
+            touch-action: none;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000 80%);
+        }
+        
+        .header {
+            padding: 15px;
+            text-align: center;
+            background: linear-gradient(135deg, #8B0000, #B22222);
+            border-bottom: 3px solid #ffcc00;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .title {
+            font-size: 2.8rem;
+            background: linear-gradient(45deg, #ffcc00, #ff9900);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            color: #4cdfff;
+            font-size: 1.4rem;
+        }
+        
+        #game-container {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top: 5px solid #ff3333;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #loading-text {
+            color: #fff;
+            font-size: 1.2rem;
+            text-align: center;
+            max-width: 80%;
+            margin-bottom: 20px;
+        }
+        
+        #progress-bar {
+            width: 80%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #52c41a, #a0d911);
+            transition: width 0.3s;
+        }
+        
+        #error-message {
+            display: none;
+            background: rgba(200, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        #controls {
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-top: 1px solid #333;
+        }
+        
+        .control-btn {
+            background: linear-gradient(to bottom, #444, #222);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .control-btn:hover {
+            background: linear-gradient(to bottom, #555, #333);
+            transform: translateY(-2px);
+        }
+        
+        #reward-video {
+            display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 999;
+        }
+        
+        #close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+        
+        #fullscreen-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            border: 1px solid #666;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+        }
+        
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px;
+            }
+            
+            .title {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .control-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            
+            #close-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- 状态栏 -->
-    <div id="status-bar">
-        <div id="game-title">拳皇KOF7K - NFC特别版</div>
-        <div>游戏加载成功！请开始游戏</div>
+    <div class="header">
+        <h1 class="title">拳皇KOF7K - Base64分块加载版</h1>
+        <p class="subtitle">突破文件限制，完美解决部署问题</p >
     </div>
-
-    <!-- 控制切换按钮 -->
-    <button id="controls-toggle">隐藏/显示按键</button>
-
-    <!-- 操作说明 -->
-    <div id="instructions">
-        玩家1：WASD移动，UIOP/JKL攻击 | 玩家2：方向键移动，数字键攻击
+    
+    <div id="game-container">
+        <div id="loading-overlay">
+            <div class="loader"></div>
+            <div id="loading-text">正在加载游戏资源，请稍候...</div>
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+            <div id="error-message"></div>
+        </div>
     </div>
-
-    <!-- 游戏容器 -->
-    <div id="game-container"></div>
-
-    <!-- 虚拟按键 - 玩家1 -->
-    <div id="player1-controls">
-        <div class="virtual-key key-w directional">W</div>
-        <div class="virtual-key key-a directional">A</div>
-        <div class="virtual-key key-s directional">S</div>
-        <div class="virtual-key key-d directional">D</div>
-        
-        <div class="virtual-key key-u action-key">U</div>
-        <div class="virtual-key key-i action-key">I</div>
-        <div class="virtual-key key-o action-key">O</div>
-        
-        <div class="virtual-key key-j action-key">J</div>
-        <div class="virtual-key key-k action-key">K</div>
-        <div class="virtual-key key-l action-key">L</div>
+    
+    <div id="controls">
+        <button class="control-btn" id="reload-btn">
+            <span>🔄</span> 重新加载
+        </button>
+        <button class="control-btn" id="volume-btn">
+            <span>🔊</span> 音量
+        </button>
+        <button class="control-btn" id="test-video-btn">
+            <span>🎬</span> 测试视频
+        </button>
     </div>
-
-    <!-- 虚拟按键 - 玩家2 -->
-    <div id="player2-controls">
-        <div class="virtual-key key-up directional">↑</div>
-        <div class="virtual-key key-left directional">←</div>
-        <div class="virtual-key key-down directional">↓</div>
-        <div class="virtual-key key-right directional">→</div>
-        
-        <div class="virtual-key key-1 action-key">1</div>
-        <div class="virtual-key key-2 action-key">2</div>
-        <div class="virtual-key key-3 action-key">3</div>
-        <div class="virtual-key key-4 action-key">4</div>
-        <div class="virtual-key key-5 action-key">5</div>
-        <div class="virtual-key key-6 action-key">6</div>
-    </div>
-
-    <!-- 按键提示 -->
-    <div class="control-hint">
-        长按按键持续操作，松手停止
-    </div>
-
-    <!-- 视频奖励 -->
-    <video id="reward-video" controls playsinline></video>
+    
+    <video id="reward-video" controls playsinline>
+        <source src="reward_video.mp4" type="video/mp4">
+        您的浏览器不支持视频播放
+    </video>
+    
     <button id="close-btn">返回游戏</button>
+    <button id="fullscreen-btn">全屏播放</button>
 
-    <!-- 引入Ruffle -->
     <script src="ruffle.js"></script>
     <script>
-        // 键盘映射表
-        const keyMap = {
-            // 玩家1
-            'w': 87, 'a': 65, 's': 83, 'd': 68,
-            'u': 85, 'i': 73, 'o': 79,
-            'j': 74, 'k': 75, 'l': 76,
-            // 玩家2
-            'up': 38, 'left': 37, 'down': 40, 'right': 39,
-            '1': 49, '2': 50, '3': 51, '4': 52, '5': 53, '6': 54
-        };
-
-        // 按键状态跟踪
-        const activeKeys = new Set();
-
-        // 初始化Ruffle
-        const ruffle = window.RufflePlayer.newest();
-        const player = ruffle.createPlayer();
-        const gameContainer = document.getElementById("game-container");
-        gameContainer.appendChild(player);
-
-        // 加载游戏
-        player.load({
-            url: "game.swf",
-            autoplay: "on",
-            unmuteOverlay: "visible",
-            background: "#000000"
-        }).then(() => {
-            console.log("游戏加载成功！");
-        }).catch(err => {
-            console.error("游戏加载失败:", err);
-        });
-
-        // 虚拟按键事件处理
-        function setupVirtualKeys() {
-            const keys = document.querySelectorAll('.virtual-key');
-            
-            keys.forEach(key => {
-                const keyClass = Array.from(key.classList)
-                    .find(cls => cls.startsWith('key-'))
-                    .replace('key-', '');
-                
-                if (keyMap[keyClass] !== undefined) {
-                    // 触摸开始
-                    key.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
-                        simulateKey(keyClass, true);
-                        key.classList.add('active');
-                    }, { passive: false });
-                    
-                    // 触摸结束
-                    key.addEventListener('touchend', (e) => {
-                        e.preventDefault();
-                        simulateKey(keyClass, false);
-                        key.classList.remove('active');
-                    }, { passive: false });
-                    
-                    // 鼠标支持
-                    key.addEventListener('mousedown', (e) => {
-                        e.preventDefault();
-                        simulateKey(keyClass, true);
-                        key.classList.add('active');
-                    });
-                    
-                    key.addEventListener('mouseup', (e) => {
-                        e.preventDefault();
-                        simulateKey(keyClass, false);
-                        key.classList.remove('active');
-                    });
-                    
-                    key.addEventListener('mouseleave', () => {
-                        if (key.classList.contains('active')) {
-                            simulateKey(keyClass, false);
-                            key.classList.remove('active');
-                        }
-                    });
-                }
-            });
-        }
-
-        // 模拟按键
-        function simulateKey(key, isPressed) {
-            const keyCode = keyMap[key];
-            if (!keyCode) return;
-            
-            if (isPressed) {
-                if (!activeKeys.has(key)) {
-                    activeKeys.add(key);
-                    dispatchKeyEvent('keydown', keyCode);
-                }
-            } else {
-                if (activeKeys.has(key)) {
-                    activeKeys.delete(key);
-                    dispatchKeyEvent('keyup', keyCode);
-                }
-            }
-        }
-
-        // 分发键盘事件
-        function dispatchKeyEvent(type, keyCode) {
-            const event = new KeyboardEvent(type, {
-                keyCode: keyCode,
-                code: `Key${String.fromCharCode(keyCode)}`,
-                key: String.fromCharCode(keyCode).toLowerCase(),
-                bubbles: true,
-                cancelable: true
-            });
-            
-            // 尝试触发在Ruffle播放器上
-            if (player) {
-                player.dispatchEvent(event);
-            }
-            
-            // 同时触发在document上
-            document.dispatchEvent(event);
-        }
-
-        // 控制面板切换
-        document.getElementById('controls-toggle').addEventListener('click', () => {
-            const player1Controls = document.getElementById('player1-controls');
-            const player2Controls = document.getElementById('player2-controls');
-            const isVisible = player1Controls.style.display !== 'none';
-            
-            if (isVisible) {
-                player1Controls.style.display = 'none';
-                player2Controls.style.display = 'none';
-                document.getElementById('controls-toggle').textContent = '显示按键';
-            } else {
-                player1Controls.style.display = 'grid';
-                player2Controls.style.display = 'grid';
-                document.getElementById('controls-toggle').textContent = '隐藏按键';
-            }
-        });
-
-        // 通关视频功能
-        function showRewardVideo() {
-            const video = document.getElementById('reward-video');
-            const closeBtn = document.getElementById('close-btn');
-            
-            // 隐藏游戏和控制面板
-            document.getElementById('game-container').style.display = 'none';
-            document.getElementById('player1-controls').style.display = 'none';
-            document.getElementById('player2-controls').style.display = 'none';
-            document.getElementById('controls-toggle').style.display = 'none';
-            document.getElementById('instructions').style.display = 'none';
-            
-            // 显示视频
-            video.src = "reward_video.mp4";
-            video.style.display = 'block';
-            closeBtn.style.display = 'block';
-            video.play();
-        }
-
-        // 返回游戏
-        document.getElementById('close-btn').addEventListener('click', () => {
-            const video = document.getElementById('reward-video');
-            const closeBtn = document.getElementById('close-btn');
-            
-            video.style.display = 'none';
-            closeBtn.style.display = 'none';
-            video.pause();
-            
-            // 恢复显示游戏和控制面板
-            document.getElementById('game-container').style.display = 'flex';
-            document.getElementById('player1-controls').style.display = 'grid';
-            document.getElementById('player2-controls').style.display = 'grid';
-            document.getElementById('controls-toggle').style.display = 'block';
-            document.getElementById('instructions').style.display = 'block';
-        });
-
-        // 初始化虚拟按键
-        setupVirtualKeys();
-
-        // 防止页面滚动
-        document.addEventListener('touchmove', (e) => {
-            if (e.target.classList.contains('virtual-key')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        // 全局键盘事件（用于测试）
-        document.addEventListener('keydown', (e) => {
-            console.log('物理按键按下:', e.key, e.keyCode);
-        });
-
-        // 自动隐藏控制面板（3秒后）
-        setTimeout(() => {
-            document.getElementById('instructions').style.opacity = '0.5';
-        }, 3000);
+        // 初始化变量
+        const gameContainer = document.getElementById('game-container');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingText = document.getElementById('loading-text');
+        const progressBar = document.getElementById('progress-fill');
+        const errorMessage = document.getElementById('error-message');
+        const reloadBtn = document.getElementById('reload-btn');
+        const volumeBtn = document.getElementById('volume-btn');
+        const testVideoBtn = document.getElementById('test-video-btn');
+        const rewardVideo = document.getElementById('reward-video');
+        const closeBtn = document.getElementById('close-btn');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
         
-        setTimeout(() => {
-            document.getElementById('instructions').style.opacity = '0.2';
-        }, 5000);
-
-        // 测试用：按空格键触发通关
+        let rufflePlayer = null;
+        let isMuted = false;
+        
+        // 更新进度条
+        function updateProgress(percent) {
+            progressBar.style.width = percent + '%';
+            loadingText.textContent = `加载中... ${Math.round(percent)}%`;
+        }
+        
+        // 加载游戏函数
+        async function loadGame() {
+            updateProgress(0);
+            loadingOverlay.style.display = 'flex';
+            errorMessage.style.display = 'none';
+            
+            try {
+                // 加载Ruffle播放器
+                if (!window.RufflePlayer) {
+                    loadingText.textContent = '正在加载Ruffle引擎...';
+                    await new Promise((resolve) => {
+                        const script = document.createElement('script');
+                        script.src = 'ruffle.js';
+                        script.onload = resolve;
+                        document.head.appendChild(script);
+                    });
+                    updateProgress(30);
+                }
+                
+                // 创建播放器实例
+                const ruffle = window.RufflePlayer.newest();
+                rufflePlayer = ruffle.createPlayer();
+                gameContainer.appendChild(rufflePlayer);
+                updateProgress(50);
+                
+                // 加载Base64分块文件
+                loadingText.textContent = '正在加载游戏分块...';
+                const totalParts = 8; // 根据实际分块数量调整
+                let base64Data = '';
+                
+                for (let i = 1; i <= totalParts; i++) {
+                    const response = await fetch(`game_part_${i}.b64`);
+                    const text = await response.text();
+                    base64Data += text;
+                    updateProgress(50 + (i / totalParts) * 40);
+                }
+                
+                // 转换Base64为二进制
+                loadingText.textContent = '正在解码游戏数据...';
+                const binary = atob(base64Data);
+                const uintArray = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    uintArray[i] = binary.charCodeAt(i);
+                }
+                updateProgress(95);
+                
+                // 加载游戏
+                await rufflePlayer.load({
+                    data: uintArray.buffer,
+                    width: "100%",
+                    height: "100%",
+                    autoplay: "on"
+                });
+                
+                // 加载成功
+                updateProgress(100);
+                setTimeout(() => {
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                    }, 500);
+                }, 500);
+                
+            } catch (error) {
+                console.error('加载失败:', error);
+                handleError(error);
+            }
+        }
+        
+        // 错误处理
+        function handleError(error) {
+            let errorMsg = '';
+            if (error.message.includes('fetch')) {
+                errorMsg = '分块文件加载失败，请检查文件路径和网络连接';
+            } else if (error.message.includes('Ruffle')) {
+                errorMsg = 'Ruffle播放器加载失败';
+            } else {
+                errorMsg = error.message;
+            }
+            
+            errorMessage.textContent = errorMsg;
+            errorMessage.style.display = 'block';
+            reloadBtn.style.display = 'block';
+        }
+        
+        // 通关奖励
+        function showRewardVideo() {
+            gameContainer.style.display = 'none';
+            rewardVideo.style.display = 'block';
+            closeBtn.style.display = 'block';
+            fullscreenBtn.style.display = 'block';
+            
+            rewardVideo.play().catch(e => {
+                console.log('视频自动播放失败:', e);
+                rewardVideo.controls = true;
+            });
+        }
+        
+        // 返回游戏
+        function backToGame() {
+            rewardVideo.style.display = 'none';
+            closeBtn.style.display = 'none';
+            fullscreenBtn.style.display = 'none';
+            rewardVideo.pause();
+            gameContainer.style.display = 'flex';
+        }
+        
+        // 切换音量
+        function toggleVolume() {
+            isMuted = !isMuted;
+            if (rufflePlayer) {
+                rufflePlayer.muted = isMuted;
+            }
+            volumeBtn.innerHTML = isMuted ? '<span>🔇</span> 音量' : '<span>🔊</span> 音量';
+        }
+        
+        // 全屏播放视频
+        function toggleFullscreen() {
+            if (rewardVideo.requestFullscreen) {
+                rewardVideo.requestFullscreen();
+            } else if (rewardVideo.mozRequestFullScreen) {
+                rewardVideo.mozRequestFullScreen();
+            } else if (rewardVideo.webkitRequestFullscreen) {
+                rewardVideo.webkitRequestFullscreen();
+            } else if (rewardVideo.msRequestFullscreen) {
+                rewardVideo.msRequestFullscreen();
+            }
+        }
+        
+        // 事件监听
+        reloadBtn.addEventListener('click', loadGame);
+        volumeBtn.addEventListener('click', toggleVolume);
+        testVideoBtn.addEventListener('click', showRewardVideo);
+        closeBtn.addEventListener('click', backToGame);
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+        
+        // 监听键盘事件
         document.addEventListener('keydown', (e) => {
-            if (e.key === ' ') {
-                showRewardVideo();
+            if (e.key === 'Escape') {
+                backToGame();
             }
         });
+        
+        // 页面加载后自动开始加载游戏
+        window.addEventListener('DOMContentLoaded', loadGame);
     </script>
 </body>
 </html>
