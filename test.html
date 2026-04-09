@@ -1,204 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>拳皇KOF7K - 最终修复版</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background: #000;
-            color: #fff;
-            font-family: "Microsoft Yahei", sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .header {
-            padding: 15px;
-            text-align: center;
-            background: linear-gradient(135deg, #8B0000, #B22222);
-            border-bottom: 3px solid #ffcc00;
-        }
-        
-        .title {
-            font-size: 2.5rem;
-            background: linear-gradient(45deg, #ffcc00, #ff9900);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 5px;
-        }
-        
-        .subtitle {
-            color: #4cdfff;
-            font-size: 1.2rem;
-        }
-        
-        #game-container {
-            flex: 1;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        #loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-        
-        .loader {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            border-top: 4px solid #ff3333;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        #loading-text {
-            color: #fff;
-            font-size: 1.1rem;
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 0 20px;
-        }
-        
-        #progress-bar {
-            width: 80%;
-            height: 6px;
-            background: #333;
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-        
-        #progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #52c41a, #a0d911);
-            transition: width 0.3s;
-        }
-        
-        #error-message {
-            display: none;
-            background: rgba(200, 0, 0, 0.8);
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px;
-            text-align: center;
-            max-width: 80%;
-            font-size: 0.9rem;
-        }
-        
-        .file-status {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 8px;
-            border-radius: 5px;
-            font-size: 0.8rem;
-            max-width: 200px;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        
-        .file-item {
-            margin: 2px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        #controls {
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.7);
-        }
-        
-        .control-btn {
-            background: #444;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 15px;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        
-        @media (max-width: 768px) {
-            .title { font-size: 1.8rem; }
-            .subtitle { font-size: 1rem; }
-            .file-status { display: none; }
-        }
-    </style>
+    <title>文件检查工具</title>
 </head>
 <body>
-    <div class="header">
-        <h1 class="title">拳皇KOF7K</h1>
-        <p class="subtitle">已优化分块加载</p>
-    </div>
+    <h2>检查分块文件是否存在</h2>
+    <div id="result"></div>
     
-    <div id="game-container">
-        <div class="file-status" id="file-status">
-            <strong>文件检测:</strong><br>
-            <div id="file-list"></div>
-        </div>
-        
-        <div id="loading-overlay">
-            <div class="loader"></div>
-            <div id="loading-text">正在检查文件...</div>
-            <div id="progress-bar">
-                <div id="progress-fill"></div>
-            </div>
-            <div id="error-message"></div>
-        </div>
-    </div>
-    
-    <div id="controls">
-        <button class="control-btn" id="reload-btn">🔄 重新加载</button>
-        <button class="control-btn" id="debug-btn">🐛 调试模式</button>
-    </div>
-
-    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <script>
-        // DOM元素
-        const gameContainer = document.getElementById('game-container');
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const loadingText = document.getElementById('loading-text');
-        const progressBar = document.getElementById('progress-fill');
-        const errorMessage = document.getElementById('error-message');
-        const reloadBtn = document.getElementById('reload-btn');
-        const debugBtn = document.getElementById('debug-btn');
-        const fileListElement = document.getElementById('file-list');
-        
-        // 分块文件列表（根据您的图片显示有10个文件，但标题说有11个）
-        const chunkFiles = [
+        const files = [
             'game_part_2.b64',
             'game_part_3.b64', 
             'game_part_4.b64',
@@ -211,214 +21,46 @@
             'game_part_11.b64'
         ];
         
-        let rufflePlayer = null;
-        let debugMode = false;
-        
-        // 更新进度和状态
-        function updateProgress(percent, message) {
-            progressBar.style.width = percent + '%';
-            loadingText.textContent = message;
-        }
-        
-        // 显示错误
-        function showError(message) {
-            errorMessage.innerHTML = message;
-            errorMessage.style.display = 'block';
-        }
-        
-        // 更新文件状态
-        function updateFileStatus(index, status, message = '') {
-            const statusText = status === 'loading' ? '⏳' : 
-                             status === 'success' ? '✅' : 
-                             status === 'error' ? '❌' : '❓';
-            
-            fileListElement.innerHTML += `<div class="file-item">${statusText} ${chunkFiles[index]} ${message}</div>`;
-        }
-        
-        // 检查文件是否存在
-        async function checkFileExists(filename) {
+        async function checkFile(file) {
             try {
-                const response = await fetch(filename, { method: 'HEAD' });
-                if (debugMode) {
-                    console.log(`检查 ${filename}: ${response.ok ? '存在' : '不存在'}`);
-                }
-                return response.ok;
-            } catch (error) {
-                if (debugMode) {
-                    console.log(`检查 ${filename} 失败:`, error);
-                }
-                return false;
-            }
-        }
-        
-        // 清理Base64数据
-        function cleanBase64Data(data) {
-            // 移除所有空白字符
-            data = data.replace(/\s/g, '');
-            // 移除可能的Base64前缀
-            data = data.replace(/^data:[^;]+;base64,/, '');
-            // 只保留有效的Base64字符
-            data = data.replace(/[^A-Za-z0-9+/=]/g, '');
-            return data;
-        }
-        
-        // 加载单个分块
-        async function loadChunk(filename, index) {
-            try {
-                updateFileStatus(index, 'loading');
-                updateProgress(Math.round((index / chunkFiles.length) * 50), 
-                              `正在加载 ${filename} (${index + 1}/${chunkFiles.length})`);
-                
-                const response = await fetch(filename);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const text = await response.text();
-                const cleanText = cleanBase64Data(text);
-                
-                updateFileStatus(index, 'success', `(${Math.round(text.length/1024)}KB)`);
-                return cleanText;
-                
-            } catch (error) {
-                updateFileStatus(index, 'error', error.message);
-                throw error;
-            }
-        }
-        
-        // 主加载函数
-        async function loadGame() {
-            try {
-                // 重置状态
-                loadingOverlay.style.display = 'flex';
-                errorMessage.style.display = 'none';
-                fileListElement.innerHTML = '';
-                
-                if (rufflePlayer && rufflePlayer.parentNode) {
-                    rufflePlayer.parentNode.removeChild(rufflePlayer);
-                    rufflePlayer = null;
-                }
-                
-                // 1. 检查文件是否存在
-                updateProgress(0, '正在检查分块文件...');
-                const fileChecks = await Promise.all(
-                    chunkFiles.map(file => checkFileExists(file))
-                );
-                
-                const missingFiles = chunkFiles.filter((file, index) => !fileChecks[index]);
-                if (missingFiles.length > 0) {
-                    throw new Error(`缺少文件: ${missingFiles.join(', ')}`);
-                }
-                
-                // 2. 检查Ruffle
-                updateProgress(10, '正在加载Ruffle引擎...');
-                if (!window.RufflePlayer) {
-                    await new Promise((resolve, reject) => {
-                        const script = document.createElement('script');
-                        script.src = 'https://unpkg.com/@ruffle-rs/ruffle';
-                        script.onload = resolve;
-                        script.onerror = () => reject(new Error('无法加载Ruffle播放器'));
-                        document.head.appendChild(script);
-                    });
-                }
-                
-                // 3. 创建播放器
-                updateProgress(20, '正在创建播放器...');
-                const ruffle = window.RufflePlayer.newest();
-                rufflePlayer = ruffle.createPlayer();
-                rufflePlayer.style.width = '100%';
-                rufflePlayer.style.height = '100%';
-                gameContainer.appendChild(rufflePlayer);
-                
-                // 4. 加载所有分块
-                updateProgress(30, '开始加载游戏数据...');
-                let allBase64Data = '';
-                
-                for (let i = 0; i < chunkFiles.length; i++) {
-                    try {
-                        const chunkData = await loadChunk(chunkFiles[i], i);
-                        allBase64Data += chunkData;
-                    } catch (error) {
-                        throw new Error(`${chunkFiles[i]} 加载失败: ${error.message}`);
-                    }
-                }
-                
-                // 5. 解码Base64
-                updateProgress(80, '正在解码游戏数据...');
-                let gameData;
-                try {
-                    const binaryString = atob(allBase64Data);
-                    const bytes = new Uint8Array(binaryString.length);
-                    for (let i = 0; i < binaryString.length; i++) {
-                        bytes[i] = binaryString.charCodeAt(i);
-                    }
-                    gameData = bytes.buffer;
-                } catch (error) {
-                    throw new Error(`Base64解码失败: ${error.message}`);
-                }
-                
-                // 6. 加载到Ruffle
-                updateProgress(90, '正在初始化游戏...');
-                await rufflePlayer.load({
-                    data: gameData,
-                    width: "100%",
-                    height: "100%",
-                    autoplay: "on",
-                    backgroundColor: "#000000"
+                const response = await fetch(file, { 
+                    method: 'HEAD', 
+                    cache: 'no-cache' 
                 });
-                
-                // 7. 加载完成
-                updateProgress(100, '游戏加载完成！');
-                setTimeout(() => {
-                    loadingOverlay.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingOverlay.style.display = 'none';
-                    }, 500);
-                }, 1000);
-                
+                if (response.ok) {
+                    return { file, exists: true, size: response.headers.get('content-length') };
+                } else {
+                    return { file, exists: false, status: response.status };
+                }
             } catch (error) {
-                console.error('游戏加载失败:', error);
-                showError(`
-                    <strong>加载失败</strong><br>
-                    ${error.message}<br><br>
-                    <small>
-                        请检查：<br>
-                        1. 所有.b64文件是否在同一目录<br>
-                        2. 文件名是否正确<br>
-                        3. 文件内容是否完整
-                    </small>
-                `);
+                return { file, exists: false, error: error.message };
+            }
+        }
+        
+        async function checkAllFiles() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>正在检查文件...</p>';
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const result = await checkFile(file);
                 
-                if (debugMode) {
-                    console.log('详细错误:', error);
+                if (result.exists) {
+                    resultDiv.innerHTML += `
+                        <p style="color:green">
+                            ✅ ${file} - 存在 (${Math.round(result.size/1024)}KB)
+                        </p>`;
+                } else {
+                    resultDiv.innerHTML += `
+                        <p style="color:red">
+                            ❌ ${file} - 不存在 (HTTP ${result.status || 'Error'})
+                        </p>`;
                 }
             }
         }
         
-        // 事件监听
-        reloadBtn.addEventListener('click', () => {
-            location.reload();
-        });
-        
-        debugBtn.addEventListener('click', () => {
-            debugMode = !debugMode;
-            debugBtn.textContent = debugMode ? '🐛 调试中' : '🐛 调试模式';
-            console.log('调试模式:', debugMode ? '开启' : '关闭');
-        });
-        
-        // 页面加载
-        window.addEventListener('DOMContentLoaded', loadGame);
-        
-        // 页面可见性变化
-        document.addEventListener('visibilitychange', () => {
-            if (rufflePlayer) {
-                if (document.hidden) {
-                    rufflePlayer.pause();
-                } else {
-                    rufflePlayer.play();
-                }
-            }
-        });
+        // 立即执行
+        checkAllFiles();
     </script>
 </body>
 </html>
